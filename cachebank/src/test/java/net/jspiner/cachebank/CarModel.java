@@ -21,18 +21,12 @@ public class CarModel implements ProviderInterface<CarModel> {
     }
 
     @Override
-    public CarModel initData() {
-        return new CarModel(
-                1245,
-                "sonata"
-        );
+    public int getCacheTime() {
+        return 1000000;
     }
 
     @Override
-    public CarModel updateData(CarModel prevData) {
-        return new CarModel(
-                5421,
-                "avante"
-        );
+    public CarModel fetchData(String key, CarModel prevData) {
+        return DummyNetwork.request(key);
     }
 }

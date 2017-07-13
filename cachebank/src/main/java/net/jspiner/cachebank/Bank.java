@@ -1,5 +1,7 @@
 package net.jspiner.cachebank;
 
+import android.support.v4.util.LruCache;
+
 /**
  * Created by JSpiner on 2017. 7. 13..
  * PRNDCompany
@@ -11,11 +13,13 @@ public final class Bank {
     private static int memCacheSize;
     private static int diskCacheSize;
     private static boolean isInitialized = false;
+    private static LruCache lruMemCache;
 
     private Bank(Builder builder){
         this.memCacheSize = builder.memCacheSize;
         this.diskCacheSize = builder.diskCacheSize;
         this.isInitialized = true;
+        this.lruMemCache = new LruCache<String, CacheObject>(memCacheSize);
     }
 
     public static boolean isInitialized(){
@@ -23,30 +27,66 @@ public final class Bank {
     }
 
     public static <T extends ProviderInterface> T get(String key, Class<T> targetClass){
-        CacheObject<T> cacheObject = CacheObject.find(key, targetClass);
-        if(cacheObject == null){
-            throw new NullPointerException();
-        }
-        boolean isExpired = isExpired(cacheObject);
+        CacheObject<T> cachedObject = getCacheObjectInCache(key, targetClass);
+
+        boolean isExpired = isExpired(cachedObject);
 
         if(isExpired){
-            cacheObject.update();
+            cachedObject.update(key);
         }
 
-        return cacheObject.getValue();
+        return cachedObject.getValue();
     }
 
-    public static <T> void put(String key, T value){
-        put(key, value, BankConstant.DEFAULT_CACHE_TIME);
+    private static <T extends ProviderInterface> CacheObject getCacheObjectInCache(String key, Class<T> targetClass){
+        CacheObject cachedObject = findInMemory(key, targetClass);
+
+        if(cachedObject == null){
+            cachedObject = findInDisk(key, targetClass);
+
+            if(cachedObject != null){
+                registerInMemory(key, cachedObject);
+            }
+        }
+
+        if(cachedObject == null){
+            cachedObject = CacheObject.newInstance(key, targetClass);
+        }
+
+        return cachedObject;
     }
 
-    public static <T> void put(String key, T value, long cacheTime){
-        
+    private static <T extends ProviderInterface> CacheObject findInMemory(String key, Class<T> targetClass){
+        CacheObject<T> cachedObject = (CacheObject<T>) lruMemCache.get(key);
+        if(cachedObject == null){
+            return null;
+        }
+        if(!cachedObject.getValue().getClass().equals(targetClass)){
+            throw new ClassCastException();
+        }
+        return cachedObject;
+    }
+
+    private static <T extends ProviderInterface> CacheObject findInDisk(String key, Class<T> targetClass){
+        return null;
+    }
+
+    private static void registerInMemory(String key, CacheObject cacheObject){
+        lruMemCache.put(key, cacheObject);
+    }
+
+    public static <T extends ProviderInterface> void put(String key, T value){
+        CacheObject<T> cacheObject = new CacheObject<>(
+                key,
+                value,
+                System.currentTimeMillis() + value.getCacheTime()
+        );
+        lruMemCache.put(key, cacheObject);
     }
 
     public static boolean isExpired(CacheObject cacheObject){
         long currentTime = System.currentTimeMillis();
-        if(cacheObject.getExpireTime() > currentTime){
+        if(cacheObject.getExpireTime() < currentTime){
             return true;
         }
         return false;

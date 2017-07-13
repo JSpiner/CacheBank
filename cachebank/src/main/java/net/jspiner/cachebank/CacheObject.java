@@ -18,11 +18,27 @@ class CacheObject<T extends ProviderInterface> {
         this.expireTime = expireTime;
     }
 
-    public static <T extends ProviderInterface> CacheObject find(String key, Class<T> targetClass){
+    public static <T extends ProviderInterface> CacheObject bind(String key, Class<T> targetClass){
         CacheObject cacheObject = new CacheObject<T>(
                 key,
                 getTargetInstance(targetClass),
                 0
+        );
+        return cacheObject;
+    }
+
+    public static <T extends ProviderInterface> CacheObject newInstance(String key, Class<T> targetClass){
+        T dataInstance = getTargetInstance(targetClass);
+        T fetchedInstance = (T)dataInstance.fetchData(key, null);
+
+        if(fetchedInstance==null){
+            fetchedInstance = dataInstance;
+        }
+
+        CacheObject cacheObject = new CacheObject<T>(
+                key,
+                fetchedInstance,
+                fetchedInstance.getCacheTime()
         );
         return cacheObject;
     }
@@ -39,8 +55,8 @@ class CacheObject<T extends ProviderInterface> {
         }
     }
 
-    public void update(){
-        value = (T)value.updateData(value);
+    public void update(String key){
+        value = (T) value.fetchData(key, value);
     }
 
     public long getExpireTime(){

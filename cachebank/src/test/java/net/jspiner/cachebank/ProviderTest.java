@@ -22,32 +22,32 @@ public class ProviderTest {
 
     @Test
     public void dataObjectReturnClassTypeTest(){
-        Object object = Bank.get("key", CarModel.class);
+        Object object = Bank.get("sonata", CarModel.class);
         Assert.assertEquals(object.getClass(), CarModel.class);
     }
 
     @Test
+    public void emptyDataObjectReturnTest(){
+        Object object = Bank.get("garbage", CarModel.class);
+        Assert.assertNull(object);
+    }
+
+    @Test
     public void dataReturnValueTest(){
-        CarModel cachedData = Bank.get("key", CarModel.class);
+        CarModel cachedData = Bank.get("sonata", CarModel.class);
 
         Assert.assertEquals("sonata", cachedData.carName);
-        Assert.assertEquals(1254, cachedData.index);
+        Assert.assertEquals(1255, cachedData.index);
     }
 
     @Test
     public void dataUpdateReturnValueTest(){
         CarModel cachedData;
-        cachedData = Bank.get("key", CarModel.class);
-        cachedData = Bank.get("key", CarModel.class);
+        cachedData = Bank.get("sonata", CarModel.class);
+        cachedData = Bank.get("avante", CarModel.class);
 
         Assert.assertEquals("avante", cachedData.carName);
-        Assert.assertEquals(5421, cachedData.index);
-
-    }
-
-    @Test
-    public void putDataObjectTest(){
-
+        Assert.assertEquals(1256, cachedData.index);
 
     }
 

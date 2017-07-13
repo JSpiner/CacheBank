@@ -8,7 +8,7 @@ package net.jspiner.cachebank;
 
 public interface ProviderInterface<T> {
 
-    T initData();
-    T updateData(T prevData);
+    int getCacheTime();
+    T fetchData(String key, T prevData);
 
 }
