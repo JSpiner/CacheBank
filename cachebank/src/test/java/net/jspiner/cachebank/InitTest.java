@@ -16,11 +16,13 @@ public class InitTest {
     public void tearDown(){
         Bank.clear();
         Bank.terminate();
+
+        Assert.assertFalse(Bank.isInitialized());
     }
 
     @Test
     public void builderInitTest(){
-        Bank.Builder.init();
+        new Bank.Builder().init();
 
         Assert.assertTrue(Bank.isInitialized());
     }
@@ -28,8 +30,9 @@ public class InitTest {
     @Test
     public void builderInitWithMemSizeTest(){
         int memCacheSize = 100;
-        Bank.Builder.init()
-                .setMemCacheSize(memCacheSize);
+        new Bank.Builder()
+                .setMemCacheSize(memCacheSize)
+                .init();
 
 
         Assert.assertTrue(Bank.isInitialized());
@@ -39,8 +42,9 @@ public class InitTest {
     @Test
     public void builderInitwithDiskSizeTest(){
         int diskCacheSize = 100;
-        Bank.Builder.init()
-                .setDiskCacheSize(diskCacheSize);
+        new Bank.Builder()
+                .setDiskCacheSize(diskCacheSize)
+                .init();
 
         Assert.assertTrue(Bank.isInitialized());
         Assert.assertEquals(diskCacheSize, Bank.getDiskCacheSize());
@@ -52,9 +56,10 @@ public class InitTest {
         int memCacheSize = 100;
         int diskCacheSize = 100;
 
-        Bank.Builder.init()
+        new Bank.Builder()
                 .setMemCacheSize(100)
-                .setDiskCacheSize(100);
+                .setDiskCacheSize(100)
+                .init();
 
         Assert.assertTrue(Bank.isInitialized());
         Assert.assertEquals(memCacheSize, Bank.getMemCacheSize());
