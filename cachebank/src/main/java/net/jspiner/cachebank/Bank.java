@@ -23,20 +23,25 @@ public final class Bank {
     }
 
     public static <T extends ProviderInterface> T get(String key, Class<T> targetClass){
-        T instance;
-        try {
-            instance = targetClass.newInstance();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
+        CacheObject<T> cacheObject = CacheObject.find(key, targetClass);
+        if(cacheObject == null){
+            throw new NullPointerException();
+        }
+        boolean isExpired = isExpired(cacheObject);
+
+        if(isExpired){
+            cacheObject.update();
         }
 
-        
+        return cacheObject.getValue();
+    }
 
-        return instance;
+    public static boolean isExpired(CacheObject cacheObject){
+        long currentTime = System.currentTimeMillis();
+        if(cacheObject.getExpireTime() > currentTime){
+            return true;
+        }
+        return false;
     }
 
     public static int getMemCacheSize() {
