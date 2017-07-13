@@ -1,11 +1,13 @@
-CacheBank
+CacheBank 
+![travis](https://travis-ci.org/JSpiner/CacheBank.svg?branch=master)
 ---------------
 CacheBank is android mem-disk cache library
 
 (will) supporting mem/disk cache
 
-####
-STILL DEVELOPING!!
+
+# STILL DEVELOPING!!
+ASAP....
 
 Set up
 -------------
@@ -25,18 +27,19 @@ new Bank.Builder()
 Define DataModel
 ----------------
 ```java
-class CarModel implements ProviderInterface<CarModel> {
+class CarModel extends Provider<CarModel> {
 
     public int index;
     public String carName;
 
+    //optional, if you don't override, use default
     @Override
-    public CarModel initData() {
-        return yourFetchDataFunction();
+    public int getCacheTime() {
+        return 1 * 1000;
     }
 
     @Override
-    public CarModel updateData(CarModel prevData) {
+    public CarModel fetchData(CarModel prevData) {
         return yourFetchDataFunction(prevData);
     }
 
