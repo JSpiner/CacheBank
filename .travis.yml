@@ -16,3 +16,4 @@ before_install:
 skip_cleanup: true
 script:
 - ./gradlew test
+- ./gradlew connectedAndroidTest coveralls
