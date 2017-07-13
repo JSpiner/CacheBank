@@ -21,13 +21,13 @@ public class ProviderTest {
     }
 
     @Test
-    public void getDataObjectReturnClassTypeTest(){
+    public void dataObjectReturnClassTypeTest(){
         Object object = Bank.get("key", CarModel.class);
         Assert.assertEquals(object.getClass(), CarModel.class);
     }
 
     @Test
-    public void checkDataReturnValueTest(){
+    public void dataReturnValueTest(){
         CarModel cachedData = Bank.get("key", CarModel.class);
 
         Assert.assertEquals("sonata", cachedData.carName);
@@ -35,10 +35,20 @@ public class ProviderTest {
     }
 
     @Test
-    public void putDataObjectTest(){
-        Bank.put("key", new CarModel());
+    public void dataUpdateReturnValueTest(){
+        CarModel cachedData;
+        cachedData = Bank.get("key", CarModel.class);
+        cachedData = Bank.get("key", CarModel.class);
 
-        
+        Assert.assertEquals("avante", cachedData.carName);
+        Assert.assertEquals(5421, cachedData.index);
+
+    }
+
+    @Test
+    public void putDataObjectTest(){
+
+
     }
 
 }

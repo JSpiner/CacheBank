@@ -11,13 +11,28 @@ public class CarModel implements ProviderInterface<CarModel> {
     public int index;
     public String carName;
 
+    public CarModel(){
+
+    }
+
+    public CarModel(int index, String carName){
+        this.index = index;
+        this.carName = carName;
+    }
+
     @Override
     public CarModel initData() {
-        return null;
+        return new CarModel(
+                1245,
+                "sonata"
+        );
     }
 
     @Override
     public CarModel updateData(CarModel prevData) {
-        return null;
+        return new CarModel(
+                5421,
+                "avante"
+        );
     }
 }

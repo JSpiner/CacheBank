@@ -36,6 +36,14 @@ public final class Bank {
         return cacheObject.getValue();
     }
 
+    public static <T> void put(String key, T value){
+        put(key, value, BankConstant.DEFAULT_CACHE_TIME);
+    }
+
+    public static <T> void put(String key, T value, long cacheTime){
+        
+    }
+
     public static boolean isExpired(CacheObject cacheObject){
         long currentTime = System.currentTimeMillis();
         if(cacheObject.getExpireTime() > currentTime){
