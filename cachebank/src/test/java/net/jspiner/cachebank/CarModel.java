@@ -11,6 +11,10 @@ public class CarModel extends Provider<CarModel> {
     public int index;
     public String carName;
 
+    public CarModel(){
+
+    }
+
     public CarModel(int index, String carName){
         this.index = index;
         this.carName = carName;
