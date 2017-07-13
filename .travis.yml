@@ -15,5 +15,4 @@ before_install:
 - chmod +rx app
 skip_cleanup: true
 script:
-- ./gradlew test
-- ./gradlew connectedAndroidTest coveralls
+- ./gradlew test coveralls
