@@ -22,6 +22,23 @@ public final class Bank {
         return isInitialized;
     }
 
+    public static <T extends ProviderInterface> T get(String key, Class<T> targetClass){
+        T instance;
+        try {
+            instance = targetClass.newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+            return null;
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        
+
+        return instance;
+    }
+
     public static int getMemCacheSize() {
         return memCacheSize;
     }
