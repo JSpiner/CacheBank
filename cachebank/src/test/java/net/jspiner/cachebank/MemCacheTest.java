@@ -6,5 +6,5 @@ package net.jspiner.cachebank;
  * Contact : smith@gmail.com
  */
 
-public class Bank {
+public class MemCacheTest {
 }
