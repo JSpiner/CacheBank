@@ -1,4 +1,7 @@
 apply plugin: 'com.android.application'
+apply plugin: 'jacoco-android'
+apply plugin: 'com.github.kt3k.coveralls'
+
 
 android {
     compileSdkVersion 25
@@ -12,10 +15,17 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    productFlavors {
+        free {}
+        paid {}
     }
 }
 
@@ -25,7 +35,14 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
     compile project(':cachebank')
+}
+coveralls {
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoTestFreeDebugUnitTestReport/jacocoTestFreeDebugUnitTestReport.xml"
+}
+
+tasks.coveralls {
+    dependsOn 'test'
+    onlyIf { System.env.'CI' }
 }

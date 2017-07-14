@@ -6,7 +6,7 @@ package net.jspiner.cachebank;
  * Contact : smith@gmail.com
  */
 
-public class CarModel implements ProviderInterface<CarModel> {
+public class CarModel extends Provider<CarModel> {
 
     public int index;
     public String carName;
@@ -22,7 +22,7 @@ public class CarModel implements ProviderInterface<CarModel> {
 
     @Override
     public int getCacheTime() {
-        return 1000000;
+        return 1000;
     }
 
     @Override

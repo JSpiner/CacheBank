@@ -66,5 +66,13 @@ public class InitTest {
         Assert.assertEquals(diskCacheSize, Bank.getDiskCacheSize());
     }
 
+    @Test
+    public void builderInitWithCacheModeDiskTest(){
+        new Bank.Builder()
+                .setCacheMode(CacheMode.DISK_ONLY)
+                .init();
+
+    }
+
 
 }

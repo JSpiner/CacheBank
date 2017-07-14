@@ -14,10 +14,12 @@ public final class Bank {
     private static int diskCacheSize;
     private static boolean isInitialized = false;
     private static LruCache lruMemCache;
+    private static CacheMode cacheMode;
 
     private Bank(Builder builder){
         this.memCacheSize = builder.memCacheSize;
         this.diskCacheSize = builder.diskCacheSize;
+        this.cacheMode = builder.cacheMode;
         this.isInitialized = true;
         this.lruMemCache = new LruCache<String, CacheObject>(memCacheSize);
     }
@@ -112,6 +114,7 @@ public final class Bank {
 
         private int memCacheSize;
         private int diskCacheSize;
+        private CacheMode cacheMode;
 
         public Builder(){
             memCacheSize = BankConstant.DEFAULT_MEM_CACHE_SIZE;
@@ -129,6 +132,11 @@ public final class Bank {
 
         public Builder setDiskCacheSize(int diskCacheSize) {
             this.diskCacheSize = diskCacheSize;
+            return this;
+        }
+
+        public Builder setCacheMode(CacheMode cacheMode){
+            this.cacheMode = cacheMode;
             return this;
         }
     }
