@@ -10,6 +10,9 @@ android:
     - android-25
     - extra-android-support
     - extra-android-m2repository
+env:
+  global:
+    - COVERALLS_REPO_TOKEN=22wDc8ykTjwGiirppxb9WD7izGJXJmiAb
 before_install:
 - chmod +x gradlew
 - chmod +rx app
