@@ -5,6 +5,11 @@ import android.support.annotation.Nullable;
 import net.jspiner.cachebank.DummyNetwork;
 import net.jspiner.cachebank.Provider;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.annotations.NonNull;
+
 /**
  * Created by JSpiner on 2017. 7. 13..
  * PRNDCompany
@@ -33,5 +38,12 @@ public class CarModel extends Provider<CarModel> {
     @Override
     public CarModel fetchData(String key, @Nullable CarModel prevData) {
         return DummyNetwork.requestCar(key);
+    }
+
+    @Override
+    public Observable<CarModel> fetchDataObservable(String key, @Nullable CarModel prevData) {
+        return Observable.create(e -> {
+            e.onNext(DummyNetwork.requestCar(key));
+        });
     }
 }

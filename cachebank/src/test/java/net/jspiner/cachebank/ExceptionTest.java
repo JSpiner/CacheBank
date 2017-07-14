@@ -37,7 +37,7 @@ public class ExceptionTest {
     public void classCastExceptionTest(){
         Bank.put("sonata", new CarModel(1933, "sonata-new"));
         try {
-            Bank.get("sonata", FoodModel.class);
+            Bank.getNow("sonata", FoodModel.class);
         }catch (Exception e){
             Assert.assertEquals(ClassCastException.class, e.getClass());
         }
@@ -46,7 +46,7 @@ public class ExceptionTest {
     @Test
     public void instantiationExceptionTest(){
         try {
-            Bank.get("monky", AnimalModel.class);
+            Bank.getNow("monky", AnimalModel.class);
         } catch (Exception e){
             Assert.assertEquals(InstantiationException.class, e.getCause().getClass());
         }
@@ -58,7 +58,7 @@ public class ExceptionTest {
         Bank.put("monky", new AnimalModel(3123, "monkey"));
         try {
             Thread.sleep(1000);
-            Bank.get("monky", AnimalModel.class);
+            Bank.getNow("monky", AnimalModel.class);
         } catch (Exception e){
             Assert.assertEquals(InstantiationException.class, e.getCause().getClass());
         }
