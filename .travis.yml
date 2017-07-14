@@ -20,6 +20,7 @@ skip_cleanup: true
 script:
 - export COVERALLS_REPO_TOKEN=22wDc8ykTjwGiirppxb9WD7izGJXJmiAb
 - export CI=true
+- export CI_NAME=travis-ci
 - ./gradlew jacocoTestReport
 after_success:
 - ./gradlew coveralls
