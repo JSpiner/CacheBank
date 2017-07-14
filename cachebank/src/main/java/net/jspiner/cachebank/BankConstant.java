@@ -11,5 +11,6 @@ public class BankConstant {
     public static int DEFAULT_MEM_CACHE_SIZE = 100;
     public static int DEFAULT_DISK_CACHE_SIZE = 100;
     public static int DEFAULT_CACHE_TIME = 100;
+    public static CacheMode DEFAULT_CACHE_MODE = CacheMode.ALL;
 
 }

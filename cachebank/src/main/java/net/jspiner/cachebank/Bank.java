@@ -103,6 +103,10 @@ public final class Bank {
         return diskCacheSize;
     }
 
+    public static CacheMode getCacheMode() {
+        return cacheMode;
+    }
+
     public static void clear(){
         clearDiskCache();
         clearMemoryCache();
@@ -130,6 +134,7 @@ public final class Bank {
         public Builder(){
             memCacheSize = BankConstant.DEFAULT_MEM_CACHE_SIZE;
             diskCacheSize = BankConstant.DEFAULT_DISK_CACHE_SIZE;
+            cacheMode = BankConstant.DEFAULT_CACHE_MODE;
         }
 
         public Bank init(){
