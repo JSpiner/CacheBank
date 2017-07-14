@@ -39,7 +39,7 @@ dependencies {
     compile project(':cachebank')
 }
 coveralls {
-    jacocoReportPath = "${buildDir}/reports/coverage/debug/report.xml"
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoTestFreeDebugUnitTestReport/jacocoTestFreeDebugUnitTestReport.xml"
 }
 
 tasks.coveralls {

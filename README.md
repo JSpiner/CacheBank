@@ -1,5 +1,6 @@
 CacheBank 
 ![travis](https://travis-ci.org/JSpiner/CacheBank.svg?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/JSpiner/CacheBank/badge.svg?branch=master)](https://coveralls.io/github/JSpiner/CacheBank?branch=master)
 ---------------
 CacheBank is android mem-disk cache library
 

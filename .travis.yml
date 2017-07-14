@@ -18,4 +18,8 @@ before_install:
 - chmod +rx app
 skip_cleanup: true
 script:
-- ./gradlew test coveralls
+- export COVERALLS_REPO_TOKEN=22wDc8ykTjwGiirppxb9WD7izGJXJmiAb
+- export CI=true
+- ./gradlew jacocoTestReport
+after_success:
+- ./gradlew coveralls
