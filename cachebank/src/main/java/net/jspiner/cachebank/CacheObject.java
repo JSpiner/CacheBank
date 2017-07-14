@@ -3,7 +3,7 @@ package net.jspiner.cachebank;
 /**
  * Created by JSpiner on 2017. 7. 13..
  * PRNDCompany
- * Contact : smith@gmail.com
+ * Contact : smith@prnd.co.kr
  */
 
 class CacheObject<T extends ProviderInterface> {
@@ -47,11 +47,9 @@ class CacheObject<T extends ProviderInterface> {
         try {
             return targetClass.newInstance();
         } catch (InstantiationException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException("DataModel must have default constructor()", e);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException("IllegalAccessException", e);
         }
     }
 

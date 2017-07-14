@@ -7,7 +7,7 @@ import org.junit.Test;
 /**
  * Created by JSpiner on 2017. 7. 13..
  * PRNDCompany
- * Contact : smith@gmail.com
+ * Contact : smith@prnd.co.kr
  */
 
 public class InitTest {
@@ -72,6 +72,26 @@ public class InitTest {
                 .setCacheMode(CacheMode.DISK_ONLY)
                 .init();
 
+        Assert.assertEquals(CacheMode.DISK_ONLY, Bank.getCacheMode());
+    }
+
+
+    @Test
+    public void builderInitWithCacheModeDiskTest2(){
+        new Bank.Builder()
+                .setCacheMode(CacheMode.MEMORY_ONLY)
+                .init();
+
+        Assert.assertEquals(CacheMode.MEMORY_ONLY, Bank.getCacheMode());
+    }
+
+    @Test
+    public void builderInitWithCacheModeDiskTest3(){
+        new Bank.Builder()
+                .setCacheMode(CacheMode.ALL)
+                .init();
+
+        Assert.assertEquals(CacheMode.ALL, Bank.getCacheMode());
     }
 
 

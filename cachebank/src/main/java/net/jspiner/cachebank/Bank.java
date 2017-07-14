@@ -5,7 +5,7 @@ import android.support.v4.util.LruCache;
 /**
  * Created by JSpiner on 2017. 7. 13..
  * PRNDCompany
- * Contact : smith@gmail.com
+ * Contact : smith@prnd.co.kr
  */
 
 public final class Bank {
@@ -29,6 +29,8 @@ public final class Bank {
     }
 
     public static <T extends ProviderInterface> T get(String key, Class<T> targetClass){
+        checkInitAndThrow();
+
         CacheObject<T> cachedObject = getCacheObjectInCache(key, targetClass);
 
         boolean isExpired = isExpired(cachedObject);
@@ -69,6 +71,7 @@ public final class Bank {
         return cachedObject;
     }
 
+    // TODO : disk cache 구현하기
     private static <T extends ProviderInterface> CacheObject findInDisk(String key, Class<T> targetClass){
         return null;
     }
@@ -78,6 +81,8 @@ public final class Bank {
     }
 
     public static <T extends ProviderInterface> void put(String key, T value){
+        checkInitAndThrow();
+
         CacheObject<T> cacheObject = new CacheObject<>(
                 key,
                 value,
@@ -86,7 +91,7 @@ public final class Bank {
         lruMemCache.put(key, cacheObject);
     }
 
-    public static boolean isExpired(CacheObject cacheObject){
+    private static boolean isExpired(CacheObject cacheObject){
         long currentTime = System.currentTimeMillis();
         if(cacheObject.getExpireTime() < currentTime){
             return true;
@@ -94,20 +99,52 @@ public final class Bank {
         return false;
     }
 
+    private static void checkInitAndThrow(){
+        if(isInitialized() == false){
+            throw new RuntimeException("You need to start it through the Bank.Builder");
+        }
+    }
+
     public static int getMemCacheSize() {
+        checkInitAndThrow();
+
         return memCacheSize;
     }
 
     public static int getDiskCacheSize() {
+        checkInitAndThrow();
+
         return diskCacheSize;
     }
 
+    public static CacheMode getCacheMode() {
+        checkInitAndThrow();
+
+        return cacheMode;
+    }
+
     public static void clear(){
+        checkInitAndThrow();
+
+        clearDiskCache();
+        clearMemoryCache();
+    }
+
+    private static void clearMemoryCache(){
+        lruMemCache.evictAll();
+    }
+
+    // TODO : 디스크에서 캐시 초기화하는 함수 구현하기
+    private static void clearDiskCache(){
 
     }
 
     public static void terminate(){
+        checkInitAndThrow();
+
+        clear();
         isInitialized = false;
+        lruMemCache = null;
     }
 
     public final static class Builder {
@@ -119,6 +156,7 @@ public final class Bank {
         public Builder(){
             memCacheSize = BankConstant.DEFAULT_MEM_CACHE_SIZE;
             diskCacheSize = BankConstant.DEFAULT_DISK_CACHE_SIZE;
+            cacheMode = BankConstant.DEFAULT_CACHE_MODE;
         }
 
         public Bank init(){
