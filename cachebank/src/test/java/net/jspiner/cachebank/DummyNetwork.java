@@ -1,9 +1,11 @@
 package net.jspiner.cachebank;
 
+import net.jspiner.cachebank.model.CarModel;
+
 /**
  * Created by JSpiner on 2017. 7. 13..
  * PRNDCompany
- * Contact : smith@gmail.com
+ * Contact : smith@prnd.co.kr
  */
 
 public class DummyNetwork {

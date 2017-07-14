@@ -2,12 +2,23 @@ CacheBank
 ![travis](https://travis-ci.org/JSpiner/CacheBank.svg?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/JSpiner/CacheBank/badge.svg?branch=master)](https://coveralls.io/github/JSpiner/CacheBank?branch=master)
 ---------------
-CacheBank is android mem-disk cache library
+CacheBank is rx based android memory-disk cache library
 
 (will) supporting mem/disk cache
 
-
 # STILL DEVELOPING!!
+will support...
+- RxJava
+- Disk Cache
+- Cache Option
+ASAP....
+
+Cache flow
+-----------------------
+ASAP....
+
+Structure
+-------------------
 ASAP....
 
 Set up
@@ -40,8 +51,8 @@ class CarModel extends Provider<CarModel> {
     }
 
     @Override
-    public CarModel fetchData(CarModel prevData) {
-        return yourFetchDataFunction(prevData);
+    public CarModel fetchData(String key, CarModel prevData) {
+        return yourFetchDataFunction(key);
     }
 
 }
@@ -57,6 +68,15 @@ void setItemLayout(String carId){
 
     textView.setText(carModel.carName);
     ...
+}
+
+```
+
+Put Data
+------------------------
+```java
+void networkResponseCallback(String carId, CarModel carModel){
+    Bank.put(carId, carModel);
 }
 
 ```

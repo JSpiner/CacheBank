@@ -1,11 +1,14 @@
-package net.jspiner.cachebank;
+package net.jspiner.cachebank.model;
 
 import android.support.annotation.Nullable;
+
+import net.jspiner.cachebank.DummyNetwork;
+import net.jspiner.cachebank.Provider;
 
 /**
  * Created by JSpiner on 2017. 7. 13..
  * PRNDCompany
- * Contact : smith@gmail.com
+ * Contact : smith@prnd.co.kr
  */
 
 public class CarModel extends Provider<CarModel> {

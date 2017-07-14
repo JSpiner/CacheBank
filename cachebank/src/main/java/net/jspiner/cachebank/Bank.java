@@ -5,7 +5,7 @@ import android.support.v4.util.LruCache;
 /**
  * Created by JSpiner on 2017. 7. 13..
  * PRNDCompany
- * Contact : smith@gmail.com
+ * Contact : smith@prnd.co.kr
  */
 
 public final class Bank {

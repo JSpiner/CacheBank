@@ -1,5 +1,8 @@
 package net.jspiner.cachebank;
 
+import net.jspiner.cachebank.model.AnimalModel;
+import net.jspiner.cachebank.model.CarModel;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -8,7 +11,7 @@ import org.junit.Test;
 /**
  * Created by JSpiner on 2017. 7. 14..
  * PRNDCompany
- * Contact : smith@gmail.com
+ * Contact : smith@prnd.co.kr
  */
 
 public class ExceptionTest {

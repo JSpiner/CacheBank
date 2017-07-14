@@ -1,14 +1,16 @@
-package net.jspiner.cachebank;
+package net.jspiner.cachebank.model;
 
 import android.support.annotation.Nullable;
+
+import net.jspiner.cachebank.Provider;
 
 /**
  * Created by JSpiner on 2017. 7. 14..
  * PRNDCompany
- * Contact : smith@gmail.com
+ * Contact : smith@prnd.co.kr
  */
 
-public class AnimalModel extends Provider<AnimalModel>{
+public class AnimalModel extends Provider<AnimalModel> {
 
     public int index;
     public String animalName;
