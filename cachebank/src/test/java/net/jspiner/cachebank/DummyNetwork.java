@@ -8,6 +8,9 @@ package net.jspiner.cachebank;
 
 public class DummyNetwork {
 
+    /*
+    Dummy CarModel
+     */
     private static CarModel sonataModel = new CarModel(
             1255,
             "sonata"
@@ -21,7 +24,24 @@ public class DummyNetwork {
             "i30"
     );
 
-    public static CarModel request(String key){
+    /*
+    Dummy FoodModel
+     */
+    private static FoodModel burgerModel = new FoodModel(
+            2311,
+            "burger"
+    );
+    private static FoodModel breadModel = new FoodModel(
+            2312,
+            "bread"
+    );
+    private static FoodModel pizzaModel = new FoodModel(
+            2313,
+            "pizza"
+    );
+
+
+    public static CarModel requestCar(String key){
         if(key == null){
             return null;
         }
@@ -34,20 +54,18 @@ public class DummyNetwork {
         return null;
     }
 
-    public static CarModel request(){
-        return new CarModel(
-            1255,
-            "avante"
-        );
+    public static FoodModel requestFood(String key){
+        if(key == null){
+            return null;
+        }
+        if(key.equals("burger"))
+            return burgerModel;
+        if(key.equals("bread"))
+            return breadModel;
+        if(key.equals("pizza"))
+            return pizzaModel;
+        return null;
     }
 
-    public static CarModel request(CarModel carModel){
-        if(carModel == null){
-            return request();
-        }
-        return new CarModel(
-                carModel.index + 1,
-                "sonata"
-        );
-    }
+
 }

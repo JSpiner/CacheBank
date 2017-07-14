@@ -1,5 +1,7 @@
 package net.jspiner.cachebank;
 
+import android.support.annotation.Nullable;
+
 /**
  * Created by JSpiner on 2017. 7. 13..
  * PRNDCompany
@@ -26,7 +28,7 @@ public class CarModel extends Provider<CarModel> {
     }
 
     @Override
-    public CarModel fetchData(String key, CarModel prevData) {
-        return DummyNetwork.request(key);
+    public CarModel fetchData(String key, @Nullable CarModel prevData) {
+        return DummyNetwork.requestCar(key);
     }
 }

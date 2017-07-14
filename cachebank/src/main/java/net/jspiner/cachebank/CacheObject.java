@@ -47,11 +47,9 @@ class CacheObject<T extends ProviderInterface> {
         try {
             return targetClass.newInstance();
         } catch (InstantiationException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException("DataModel must have default constructor()", e);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException("IllegalAccessException", e);
         }
     }
 

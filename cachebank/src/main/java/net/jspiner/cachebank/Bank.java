@@ -69,6 +69,7 @@ public final class Bank {
         return cachedObject;
     }
 
+    // TODO : disk cache 구현하기
     private static <T extends ProviderInterface> CacheObject findInDisk(String key, Class<T> targetClass){
         return null;
     }
@@ -103,6 +104,16 @@ public final class Bank {
     }
 
     public static void clear(){
+        clearDiskCache();
+        clearMemoryCache();
+    }
+
+    // TODO : 메모리와 디스크에서 캐시 초기화하는 함수 구현하기
+    private static void clearMemoryCache(){
+
+    }
+
+    private static void clearDiskCache(){
 
     }
 
