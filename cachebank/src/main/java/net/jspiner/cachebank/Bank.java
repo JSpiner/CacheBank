@@ -2,6 +2,13 @@ package net.jspiner.cachebank;
 
 import android.support.v4.util.LruCache;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Function;
+
 /**
  * Created by JSpiner on 2017. 7. 13..
  * PRNDCompany
@@ -28,9 +35,44 @@ public final class Bank {
         return isInitialized;
     }
 
-    public static <T extends ProviderInterface> T get(String key, Class<T> targetClass){
+    public static <T extends ProviderInterface> Observable<T> get(String key, Class<T> targetClass){
         checkInitAndThrow();
 
+        Observable returnObservable = Observable.create(emmiter -> {
+
+            CacheObject<T> cachedObject = getCacheObject(key, targetClass);
+
+            emmiter.onNext(cachedObject);
+            emmiter.onComplete();
+
+        });
+        returnObservable.flatMap(new Function<CacheObject, ObservableSource<?>>() {
+            @Override
+            public ObservableSource<?> apply(@NonNull CacheObject cacheObject) throws Exception {
+                if(cacheObject.isObservable()){
+                    return cacheObject.getValueObservable();
+                }
+                return Observable.just(cacheObject.getValue());
+            }
+        });
+        return returnObservable;
+    }
+
+    public static <T extends ProviderInterface> T getNow(String key, Class<T> targetClass){
+        checkInitAndThrow();
+
+        CacheObject<T> cachedObject = getCacheObject(key, targetClass);
+
+        if(cachedObject.isObservable()){
+            return (T)cachedObject.getValueObservable().blockingFirst();
+        }
+        else{
+            return cachedObject.getValue();
+        }
+
+    }
+
+    private static <T extends ProviderInterface> CacheObject getCacheObject(String key, Class<T> targetClass){
         CacheObject<T> cachedObject = getCacheObjectInCache(key, targetClass);
 
         boolean isExpired = isExpired(cachedObject);
@@ -39,7 +81,7 @@ public final class Bank {
             cachedObject.update(key);
         }
 
-        return cachedObject.getValue();
+        return cachedObject;
     }
 
     private static <T extends ProviderInterface> CacheObject getCacheObjectInCache(String key, Class<T> targetClass){

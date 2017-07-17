@@ -1,6 +1,11 @@
-package net.jspiner.cachebank;
+package net.jspiner.cachebank.model;
 
 import android.support.annotation.Nullable;
+
+import net.jspiner.cachebank.DummyNetwork;
+import net.jspiner.cachebank.Provider;
+
+import io.reactivex.Observable;
 
 /**
  * Created by JSpiner on 2017. 7. 14..
@@ -23,8 +28,7 @@ public class FoodModel extends Provider<FoodModel> {
     }
 
     @Override
-    public FoodModel fetchData(String key, @Nullable FoodModel prevData) {
-        return DummyNetwork.requestFood(key);
+    public Observable<FoodModel> fetchDataObservable(String key, @Nullable FoodModel prevData) {
+        return super.fetchDataObservable(key, prevData);
     }
-
 }

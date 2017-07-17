@@ -1,5 +1,9 @@
 package net.jspiner.cachebank;
 
+import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
+
 /**
  * Created by JSpiner on 2017. 7. 13..
  * PRNDCompany
@@ -11,6 +15,8 @@ class CacheObject<T extends ProviderInterface> {
     private long expireTime;
     private String key;
     private T value;
+    private Observable<T> valueObservable;
+    private boolean isObservable;
 
     public CacheObject(String key, T value, long expireTime){
         this.key = key;
@@ -54,7 +60,25 @@ class CacheObject<T extends ProviderInterface> {
     }
 
     public void update(String key){
-        value = (T) value.fetchData(key, value);
+        Observable<T> fetchObservable = value.fetchDataObservable(key, value);
+
+        if(fetchObservable != null){
+            isObservable = true;
+            this.valueObservable = fetchObservable;
+        }
+        else{
+            isObservable = false;
+            T fetchData = (T)value.fetchData(key, value);
+            value = fetchData;
+        }
+    }
+
+    public Observable getValueObservable(){
+        return valueObservable;
+    }
+
+    public boolean isObservable(){
+        return isObservable;
     }
 
     public long getExpireTime(){

@@ -11,6 +11,7 @@ buildscript {
         // in the individual module build.gradle files
         classpath 'com.dicedmelon.gradle:jacoco-android:0.1.1'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.4.0'
+        classpath 'me.tatarka:gradle-retrolambda:3.2.4'
     }
 }
 
