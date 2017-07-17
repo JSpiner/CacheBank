@@ -5,7 +5,9 @@ import android.support.v4.util.LruCache;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Function;
 
 /**
  * Created by JSpiner on 2017. 7. 13..
@@ -36,14 +38,24 @@ public final class Bank {
     public static <T extends ProviderInterface> Observable<T> get(String key, Class<T> targetClass){
         checkInitAndThrow();
 
-        return Observable.create(e -> {
+        Observable returnObservable = Observable.create(emmiter -> {
 
             CacheObject<T> cachedObject = getCacheObject(key, targetClass);
 
-            e.onNext(cachedObject.getValue());
+            emmiter.onNext(cachedObject);
+            emmiter.onComplete();
 
         });
-
+        returnObservable.flatMap(new Function<CacheObject, ObservableSource<?>>() {
+            @Override
+            public ObservableSource<?> apply(@NonNull CacheObject cacheObject) throws Exception {
+                if(cacheObject.isObservable()){
+                    return cacheObject.getValueObservable();
+                }
+                return Observable.just(cacheObject.getValue());
+            }
+        });
+        return returnObservable;
     }
 
     public static <T extends ProviderInterface> T getNow(String key, Class<T> targetClass){
@@ -51,7 +63,13 @@ public final class Bank {
 
         CacheObject<T> cachedObject = getCacheObject(key, targetClass);
 
-        return cachedObject.getValue();
+        if(cachedObject.isObservable()){
+            return (T)cachedObject.getValueObservable().blockingFirst();
+        }
+        else{
+            return cachedObject.getValue();
+        }
+
     }
 
     private static <T extends ProviderInterface> CacheObject getCacheObject(String key, Class<T> targetClass){

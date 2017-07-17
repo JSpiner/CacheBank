@@ -1,6 +1,9 @@
 package net.jspiner.cachebank;
 
 import net.jspiner.cachebank.model.CarModel;
+import net.jspiner.cachebank.model.FoodModel;
+
+import io.reactivex.Observable;
 
 /**
  * Created by JSpiner on 2017. 7. 13..
@@ -67,6 +70,13 @@ public class DummyNetwork {
         if(key.equals("pizza"))
             return pizzaModel;
         return null;
+    }
+
+    public static Observable<FoodModel> requestFoodObservable(String key){
+        return Observable.create(emitter -> {
+            emitter.onNext(requestFood(key));
+            emitter.onComplete();
+        });
     }
 
 

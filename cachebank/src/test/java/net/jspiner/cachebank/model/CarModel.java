@@ -40,10 +40,4 @@ public class CarModel extends Provider<CarModel> {
         return DummyNetwork.requestCar(key);
     }
 
-    @Override
-    public Observable<CarModel> fetchDataObservable(String key, @Nullable CarModel prevData) {
-        return Observable.create(e -> {
-            e.onNext(DummyNetwork.requestCar(key));
-        });
-    }
 }

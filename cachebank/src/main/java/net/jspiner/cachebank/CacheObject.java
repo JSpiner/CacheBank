@@ -15,6 +15,8 @@ class CacheObject<T extends ProviderInterface> {
     private long expireTime;
     private String key;
     private T value;
+    private Observable<T> valueObservable;
+    private boolean isObservable;
 
     public CacheObject(String key, T value, long expireTime){
         this.key = key;
@@ -61,13 +63,22 @@ class CacheObject<T extends ProviderInterface> {
         Observable<T> fetchObservable = value.fetchDataObservable(key, value);
 
         if(fetchObservable != null){
-            //TODO : value가 끝나고 onNext를 호출해야함
-            fetchObservable.subscribe(t -> value = t);
+            isObservable = true;
+            this.valueObservable = fetchObservable;
         }
         else{
+            isObservable = false;
             T fetchData = (T)value.fetchData(key, value);
             value = fetchData;
         }
+    }
+
+    public Observable getValueObservable(){
+        return valueObservable;
+    }
+
+    public boolean isObservable(){
+        return isObservable;
     }
 
     public long getExpireTime(){

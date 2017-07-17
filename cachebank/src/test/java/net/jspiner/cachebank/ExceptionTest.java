@@ -2,6 +2,7 @@ package net.jspiner.cachebank;
 
 import net.jspiner.cachebank.model.AnimalModel;
 import net.jspiner.cachebank.model.CarModel;
+import net.jspiner.cachebank.model.FoodModel;
 
 import org.junit.After;
 import org.junit.Assert;
