@@ -63,4 +63,9 @@ public class ObservableProviderTest {
 
     }
 
+    @Test
+    public void test(){
+        
+    }
+
 }
