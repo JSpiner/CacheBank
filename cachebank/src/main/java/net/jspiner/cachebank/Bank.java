@@ -2,6 +2,10 @@ package net.jspiner.cachebank;
 
 import android.support.v4.util.LruCache;
 
+import com.jakewharton.disklrucache.DiskLruCache;
+
+import java.io.IOException;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -21,6 +25,7 @@ public final class Bank {
     private static int diskCacheSize;
     private static boolean isInitialized = false;
     private static LruCache lruMemCache;
+    private static DiskLruCache lruDiskCache;
     private static CacheMode cacheMode;
 
     private Bank(Builder builder){
@@ -176,9 +181,13 @@ public final class Bank {
         lruMemCache.evictAll();
     }
 
-    // TODO : 디스크에서 캐시 초기화하는 함수 구현하기
     private static void clearDiskCache(){
-
+        try {
+            lruDiskCache.delete();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("IOException", e);
+        }
     }
 
     public static void terminate(){
