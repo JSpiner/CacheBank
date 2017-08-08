@@ -183,7 +183,9 @@ public final class Bank {
 
     private static void clearDiskCache(){
         try {
-            lruDiskCache.delete();
+            if(lruDiskCache != null) {
+                lruDiskCache.delete();
+            }
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("IOException", e);
