@@ -3,6 +3,7 @@ package net.jspiner.cachebank;
 import net.jspiner.cachebank.model.AnimalModel;
 import net.jspiner.cachebank.model.CarModel;
 import net.jspiner.cachebank.model.FoodModel;
+import net.jspiner.cachebank.model.GunModel;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -11,8 +12,8 @@ import org.junit.Test;
 
 /**
  * Created by JSpiner on 2017. 7. 14..
- * PRNDCompany
- * Contact : smith@prnd.co.kr
+ * JSpiner
+ * Contact : jspiner@naver.com
  */
 
 public class ExceptionTest {
@@ -41,7 +42,10 @@ public class ExceptionTest {
             Bank.getNow("sonata", FoodModel.class);
         }catch (Exception e){
             Assert.assertEquals(ClassCastException.class, e.getClass());
+
+            return;
         }
+        Assert.fail();
     }
 
     @Test
@@ -50,19 +54,23 @@ public class ExceptionTest {
             Bank.getNow("monky", AnimalModel.class);
         } catch (Exception e){
             Assert.assertEquals(InstantiationException.class, e.getCause().getClass());
+            return;
         }
 
+        Assert.fail();
     }
 
     @Test
-    public void instantiationExceptionTest2(){
-        Bank.put("monky", new AnimalModel(3123, "monkey"));
+    public void illegalAccessExceptionTest(){
         try {
-            Thread.sleep(1000);
-            Bank.getNow("monky", AnimalModel.class);
+            Bank.getNow("bereta", GunModel.class);
         } catch (Exception e){
-            Assert.assertEquals(InstantiationException.class, e.getCause().getClass());
+            Assert.assertEquals(IllegalAccessException.class, e.getCause().getClass());
+
+            return;
         }
 
+        Assert.fail();
     }
+
 }

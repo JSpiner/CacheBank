@@ -12,8 +12,8 @@ import io.reactivex.annotations.NonNull;
 
 /**
  * Created by JSpiner on 2017. 7. 13..
- * PRNDCompany
- * Contact : smith@prnd.co.kr
+ * JSpiner
+ * Contact : jspiner@naver.com
  */
 
 public class CarModel extends Provider<CarModel> {

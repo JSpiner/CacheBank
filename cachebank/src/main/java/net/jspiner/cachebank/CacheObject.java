@@ -6,8 +6,8 @@ import io.reactivex.functions.Consumer;
 
 /**
  * Created by JSpiner on 2017. 7. 13..
- * PRNDCompany
- * Contact : smith@prnd.co.kr
+ * JSpiner
+ * Contact : jspiner@naver.com
  */
 
 class CacheObject<T extends ProviderInterface> {

@@ -8,12 +8,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
 import io.reactivex.internal.operators.observable.ObservableCreate;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
 
 /**
  * Created by JSpiner on 2017. 7. 14..
- * PRNDCompany
- * Contact : smith@prnd.co.kr
+ * JSpiner
+ * Contact : jspiner@naver.com
  */
 
 public class ObservableProviderTest {
@@ -29,7 +33,7 @@ public class ObservableProviderTest {
     @Test
     public void dataObjectReturnClassTypeTest(){
         Object object = Bank.get("pizza", FoodModel.class);
-        Assert.assertEquals(ObservableCreate.class, object.getClass());
+        Assert.assertThat(object, instanceOf(Observable.class));
     }
 
     @Test

@@ -50,27 +50,49 @@ class CarModel extends Provider<CarModel> {
         return 1 * 1000;
     }
 
+    //you can choose in below
     @Override
     public CarModel fetchData(String key, CarModel prevData) {
         return yourFetchDataFunction(key);
+    }
+
+    @Override
+    public Observable<CarModel> fetchDataObservable(String key, @Nullable CarModel prevData) {
+        return super.fetchDataObservable(key, prevData);
     }
 
 }
 
 ```
 
-Get Data
+Get Data(sync)
 ----------------------
 ```java
 
 void setItemLayout(String carId){
-    CarModel carModel = Bank.get(carId, CarModel.class);
+    CarModel carModel = Bank.getNow(carId, CarModel.class);
 
     textView.setText(carModel.carName);
     ...
 }
 
 ```
+
+Get Data Using Observable(async)
+----------------------
+```java
+
+void setItemLayout(String carId){
+    Observable<CarModel> carObservable = Bank.get(carId, CarModel.class);
+    carObservable.subscribe(carModel -> {
+            textView.setText(carModel.carName);
+        }
+    );
+    ...
+}
+
+```
+
 
 Put Data
 ------------------------
