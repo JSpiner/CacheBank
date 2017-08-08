@@ -6,8 +6,8 @@ import io.reactivex.Observable;
 
 /**
  * Created by JSpiner on 2017. 7. 13..
- * PRNDCompany
- * Contact : smith@prnd.co.kr
+ * JSpiner
+ * Contact : jspiner@naver.com
  */
 
 public interface ProviderInterface<T> {

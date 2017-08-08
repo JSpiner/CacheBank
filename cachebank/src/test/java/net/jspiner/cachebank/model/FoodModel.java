@@ -9,8 +9,8 @@ import io.reactivex.Observable;
 
 /**
  * Created by JSpiner on 2017. 7. 14..
- * PRNDCompany
- * Contact : smith@prnd.co.kr
+ * JSpiner
+ * Contact : jspiner@naver.com
  */
 
 public class FoodModel extends Provider<FoodModel> {

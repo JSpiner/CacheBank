@@ -6,8 +6,8 @@ import net.jspiner.cachebank.Provider;
 
 /**
  * Created by JSpiner on 2017. 7. 14..
- * PRNDCompany
- * Contact : smith@prnd.co.kr
+ * JSpiner
+ * Contact : jspiner@naver.com
  */
 
 public class AnimalModel extends Provider<AnimalModel> {

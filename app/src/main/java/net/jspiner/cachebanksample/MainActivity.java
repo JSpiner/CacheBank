@@ -8,8 +8,8 @@ import net.jspiner.cachebank.Bank;
 
 /**
  * Created by JSpiner on 2017. 7. 13..
- * PRNDCompany
- * Contact : smith@prnd.co.kr
+ * JSpiner
+ * Contact : jspiner@naver.com
  */
 
 public class MainActivity extends AppCompatActivity {

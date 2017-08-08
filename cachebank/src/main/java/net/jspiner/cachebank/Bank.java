@@ -15,8 +15,8 @@ import io.reactivex.functions.Function;
 
 /**
  * Created by JSpiner on 2017. 7. 13..
- * PRNDCompany
- * Contact : smith@prnd.co.kr
+ * JSpiner
+ * Contact : jspiner@naver.com
  */
 
 public final class Bank {
@@ -43,24 +43,19 @@ public final class Bank {
     public static <T extends ProviderInterface> Observable<T> get(String key, Class<T> targetClass){
         checkInitAndThrow();
 
-        Observable returnObservable = Observable.create(emmiter -> {
+        return Observable.create((ObservableOnSubscribe<CacheObject>)emmiter -> {
 
             CacheObject<T> cachedObject = getCacheObject(key, targetClass);
 
             emmiter.onNext(cachedObject);
             emmiter.onComplete();
 
-        });
-        returnObservable.flatMap(new Function<CacheObject, ObservableSource<?>>() {
-            @Override
-            public ObservableSource<?> apply(@NonNull CacheObject cacheObject) throws Exception {
-                if(cacheObject.isObservable()){
-                    return cacheObject.getValueObservable();
-                }
-                return Observable.just(cacheObject.getValue());
+        }).flatMap((Function<CacheObject, Observable<T>>)cacheObject -> {
+            if(cacheObject.isObservable()){
+                return cacheObject.getValueObservable();
             }
+            return Observable.just((T)cacheObject.getValue());
         });
-        return returnObservable;
     }
 
     public static <T extends ProviderInterface> T getNow(String key, Class<T> targetClass){
