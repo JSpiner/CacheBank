@@ -24,15 +24,6 @@ class CacheObject<T extends ProviderInterface> {
         this.expireTime = expireTime;
     }
 
-    public static <T extends ProviderInterface> CacheObject bind(String key, Class<T> targetClass){
-        CacheObject cacheObject = new CacheObject<T>(
-                key,
-                getTargetInstance(targetClass),
-                0
-        );
-        return cacheObject;
-    }
-
     public static <T extends ProviderInterface> CacheObject newInstance(String key, Class<T> targetClass){
         T dataInstance = getTargetInstance(targetClass);
         T fetchedInstance = (T)dataInstance.fetchData(key, null);

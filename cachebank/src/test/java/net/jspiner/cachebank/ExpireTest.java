@@ -1,11 +1,15 @@
 package net.jspiner.cachebank;
 
 import net.jspiner.cachebank.model.CarModel;
+import net.jspiner.cachebank.model.FoodModel;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
 
 /**
  * Created by JSpiner on 2017. 7. 14..
@@ -66,6 +70,26 @@ public class ExpireTest {
         Assert.assertEquals(
                 carModel.carName,
                 "avante-new"
+        );
+
+    }
+
+    @Test
+    public void observableExpireTest() throws InterruptedException {
+        Bank.put("burger", new FoodModel(5555, "hamburger"));
+        Bank.get("burger", FoodModel.class).subscribe(
+                foodModel -> {
+
+                }
+        );
+
+        Thread.sleep(1000 * 10);
+
+        Bank.get("burger", FoodModel.class).subscribe(
+                foodModel -> {
+                    Assert.assertEquals(foodModel.index, 2311);
+                    Assert.assertEquals(foodModel.foodName, "burger");
+                }
         );
 
     }
