@@ -6,7 +6,7 @@ package net.jspiner.cachebank;
  * Contact : jspiner@naver.com
  */
 
-public class BankConstant {
+public final class BankConstant {
 
     public static int DEFAULT_MEM_CACHE_SIZE = 4 * 1024 * 1024; // 4mb
     public static int DEFAULT_DISK_CACHE_SIZE = 10 * 1024 * 1024; // 10mb

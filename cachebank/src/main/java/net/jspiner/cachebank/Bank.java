@@ -1,6 +1,7 @@
 package net.jspiner.cachebank;
 
 import android.support.v4.util.LruCache;
+import android.util.Log;
 
 import com.jakewharton.disklrucache.DiskLruCache;
 
@@ -40,12 +41,12 @@ public final class Bank {
         return isInitialized;
     }
 
-    public static <T extends ProviderInterface> Observable<T> get(String key, Class<T> targetClass){
+    public static <T extends ProviderInterface> Observable<T> get(Class<T> targetClass, String key){
         checkInitAndThrow();
 
         return Observable.create((ObservableOnSubscribe<CacheObject>)emmiter -> {
 
-            CacheObject<T> cachedObject = getCacheObject(key, targetClass);
+            CacheObject<T> cachedObject = getCacheObject(targetClass, key);
 
             emmiter.onNext(cachedObject);
             emmiter.onComplete();
@@ -58,10 +59,10 @@ public final class Bank {
         });
     }
 
-    public static <T extends ProviderInterface> T getNow(String key, Class<T> targetClass){
+    public static <T extends ProviderInterface> T getNow(Class<T> targetClass, String key){
         checkInitAndThrow();
 
-        CacheObject<T> cachedObject = getCacheObject(key, targetClass);
+        CacheObject<T> cachedObject = getCacheObject(targetClass, key);
 
         if(cachedObject.isObservable()){
             return (T)cachedObject.getValueObservable().blockingFirst();
@@ -72,8 +73,8 @@ public final class Bank {
 
     }
 
-    private static <T extends ProviderInterface> CacheObject getCacheObject(String key, Class<T> targetClass){
-        CacheObject<T> cachedObject = getCacheObjectInCache(key, targetClass);
+    private static <T extends ProviderInterface> CacheObject getCacheObject(Class<T> targetClass, String key){
+        CacheObject<T> cachedObject = getCacheObjectInCache(targetClass, key);
 
         boolean isExpired = isExpired(cachedObject);
 
@@ -84,25 +85,25 @@ public final class Bank {
         return cachedObject;
     }
 
-    private static <T extends ProviderInterface> CacheObject getCacheObjectInCache(String key, Class<T> targetClass){
-        CacheObject cachedObject = findInMemory(key, targetClass);
+    private static <T extends ProviderInterface> CacheObject getCacheObjectInCache(Class<T> targetClass, String key){
+        CacheObject cachedObject = findInMemory(targetClass, key);
 
         if(cachedObject == null){
-            cachedObject = findInDisk(key, targetClass);
+            cachedObject = findInDisk(targetClass, key);
 
             if(cachedObject != null){
-                registerInMemory(key, cachedObject);
+                registerInMemory(cachedObject, key);
             }
         }
 
         if(cachedObject == null){
-            cachedObject = CacheObject.newInstance(key, targetClass);
+            cachedObject = CacheObject.newInstance(targetClass, key);
         }
 
         return cachedObject;
     }
 
-    private static <T extends ProviderInterface> CacheObject findInMemory(String key, Class<T> targetClass){
+    private static <T extends ProviderInterface> CacheObject findInMemory(Class<T> targetClass, String key){
         CacheObject<T> cachedObject = (CacheObject<T>) lruMemCache.get(key);
         if(cachedObject == null){
             return null;
@@ -114,15 +115,15 @@ public final class Bank {
     }
 
     // TODO : disk cache 구현하기
-    private static <T extends ProviderInterface> CacheObject findInDisk(String key, Class<T> targetClass){
+    private static <T extends ProviderInterface> CacheObject findInDisk(Class<T> targetClass, String key){
         return null;
     }
 
-    private static void registerInMemory(String key, CacheObject cacheObject){
-        lruMemCache.put(key, cacheObject);
+    private static void registerInMemory(CacheObject cacheObject, String key){
+        lruMemCache.put(cacheObject, key);
     }
 
-    public static <T extends ProviderInterface> void put(String key, T value){
+    public static <T extends ProviderInterface> void put(T value, String key){
         checkInitAndThrow();
 
         CacheObject<T> cacheObject = new CacheObject<>(

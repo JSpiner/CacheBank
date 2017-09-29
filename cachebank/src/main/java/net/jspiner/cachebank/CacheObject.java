@@ -10,7 +10,7 @@ import io.reactivex.functions.Consumer;
  * Contact : jspiner@naver.com
  */
 
-class CacheObject<T extends ProviderInterface> {
+final class CacheObject<T extends ProviderInterface> {
 
     private long expireTime;
     private String key;
@@ -18,13 +18,13 @@ class CacheObject<T extends ProviderInterface> {
     private Observable<T> valueObservable;
     private boolean isObservable;
 
-    public CacheObject(String key, T value, long expireTime){
+    protected CacheObject(String key, T value, long expireTime){
         this.key = key;
         this.value = value;
         this.expireTime = expireTime;
     }
 
-    public static <T extends ProviderInterface> CacheObject newInstance(String key, Class<T> targetClass){
+    protected static <T extends ProviderInterface> CacheObject newInstance(Class<T> targetClass, String key){
         T dataInstance = getTargetInstance(targetClass);
         T fetchedInstance = (T)dataInstance.fetchData(key, null);
 
@@ -50,7 +50,7 @@ class CacheObject<T extends ProviderInterface> {
         }
     }
 
-    public void update(String key){
+    protected void update(String key){
         Observable<T> fetchObservable = value.fetchDataObservable(key, value);
 
         if(fetchObservable != null){
@@ -64,23 +64,23 @@ class CacheObject<T extends ProviderInterface> {
         }
     }
 
-    public Observable getValueObservable(){
+    protected Observable getValueObservable(){
         return valueObservable;
     }
 
-    public boolean isObservable(){
+    protected boolean isObservable(){
         return isObservable;
     }
 
-    public long getExpireTime(){
+    protected long getExpireTime(){
         return expireTime;
     }
 
-    public String getKey() {
+    protected String getKey() {
         return key;
     }
 
-    public T getValue() {
+    protected T getValue() {
         return value;
     }
 }
