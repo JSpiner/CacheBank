@@ -1,6 +1,8 @@
 CacheBank 
 ![travis](https://travis-ci.org/JSpiner/CacheBank.svg?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/JSpiner/CacheBank/badge.svg?branch=master)](https://coveralls.io/github/JSpiner/CacheBank?branch=master)
+[![codebeat badge](https://codebeat.co/badges/a03172bd-ff9d-4d3b-88ed-29f48a2d8b01)](https://codebeat.co/projects/github-com-jspiner-cachebank-master)
+
 ---------------
 CacheBank is rx based android memory-disk cache library
 
