@@ -37,9 +37,9 @@ public class ExceptionTest {
 
     @Test
     public void classCastExceptionTest(){
-        Bank.put("sonata", new CarModel(1933, "sonata-new"));
+        Bank.put(new CarModel(1933, "sonata-new"), "sonata");
         try {
-            Bank.getNow("sonata", FoodModel.class);
+            Bank.getNow(FoodModel.class, "sonata");
         }catch (Exception e){
             Assert.assertEquals(ClassCastException.class, e.getClass());
 
@@ -51,7 +51,7 @@ public class ExceptionTest {
     @Test
     public void instantiationExceptionTest(){
         try {
-            Bank.getNow("monky", AnimalModel.class);
+            Bank.getNow(AnimalModel.class, "monky");
         } catch (Exception e){
             Assert.assertEquals(InstantiationException.class, e.getCause().getClass());
             return;
@@ -63,7 +63,7 @@ public class ExceptionTest {
     @Test
     public void illegalAccessExceptionTest(){
         try {
-            Bank.getNow("bereta", GunModel.class);
+            Bank.getNow(GunModel.class, "bereta");
         } catch (Exception e){
             Assert.assertEquals(IllegalAccessException.class, e.getCause().getClass());
 

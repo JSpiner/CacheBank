@@ -38,11 +38,11 @@ public class ExpireTest {
 
     @Test
     public void expireTest() throws InterruptedException {
-        Bank.put("avante", new CarModel(9986, "avante-new"));
+        Bank.put(new CarModel(9986, "avante-new"), "avante");
 
         Thread.sleep(1000 * 2);
 
-        CarModel carModel = Bank.getNow("avante", CarModel.class);
+        CarModel carModel = Bank.getNow(CarModel.class, "avante");
 
         Assert.assertEquals(
                 carModel.index,
@@ -57,11 +57,11 @@ public class ExpireTest {
 
     @Test
     public void notExpireTest() throws InterruptedException {
-        Bank.put("avante", new CarModel(9986, "avante-new"));
+        Bank.put(new CarModel(9986, "avante-new"), "avante");
 
         Thread.sleep(500);
 
-        CarModel carModel = Bank.getNow("avante", CarModel.class);
+        CarModel carModel = Bank.getNow(CarModel.class, "avante");
 
         Assert.assertEquals(
                 carModel.index,
@@ -76,8 +76,8 @@ public class ExpireTest {
 
     @Test
     public void observableExpireTest() throws InterruptedException {
-        Bank.put("burger", new FoodModel(5555, "hamburger"));
-        Bank.get("burger", FoodModel.class).subscribe(
+        Bank.put(new FoodModel(5555, "hamburger"), "burger");
+        Bank.get(FoodModel.class, "burger").subscribe(
                 foodModel -> {
 
                 }
@@ -85,7 +85,7 @@ public class ExpireTest {
 
         Thread.sleep(1000 * 10);
 
-        Bank.get("burger", FoodModel.class).subscribe(
+        Bank.get(FoodModel.class, "burger").subscribe(
                 foodModel -> {
                     Assert.assertEquals(foodModel.index, 2311);
                     Assert.assertEquals(foodModel.foodName, "burger");

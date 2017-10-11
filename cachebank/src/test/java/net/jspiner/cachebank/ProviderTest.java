@@ -24,19 +24,19 @@ public class ProviderTest {
 
     @Test
     public void dataObjectReturnClassTypeTest(){
-        Object object = Bank.getNow("sonata", CarModel.class);
+        Object object = Bank.getNow(CarModel.class, "sonata");
         Assert.assertEquals(object.getClass(), CarModel.class);
     }
 
     @Test
     public void emptyDataObjectReturnTest(){
-        Object object = Bank.getNow("garbage", CarModel.class);
+        Object object = Bank.getNow(CarModel.class, "garbage");
         Assert.assertNull(object);
     }
 
     @Test
     public void dataReturnValueTest(){
-        CarModel cachedData = Bank.getNow("sonata", CarModel.class);
+        CarModel cachedData = Bank.getNow(CarModel.class, "sonata");
 
         Assert.assertEquals("sonata", cachedData.carName);
         Assert.assertEquals(1255, cachedData.index);
@@ -45,8 +45,8 @@ public class ProviderTest {
     @Test
     public void dataUpdateReturnValueTest(){
         CarModel cachedData;
-        cachedData = Bank.getNow("sonata", CarModel.class);
-        cachedData = Bank.getNow("avante", CarModel.class);
+        cachedData = Bank.getNow(CarModel.class, "sonata");
+        cachedData = Bank.getNow(CarModel.class, "avante");
 
         Assert.assertEquals("avante", cachedData.carName);
         Assert.assertEquals(1256, cachedData.index);

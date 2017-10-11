@@ -34,17 +34,17 @@ public class MemCacheTest {
 
     @Test
     public void dataLoadTest(){
-        Bank.put("genesis", new CarModel(9987, "genesis"));
-        CarModel cachedData = Bank.getNow("genesis", CarModel.class);
+        Bank.put(new CarModel(9987, "genesis"), "genesis");
+        CarModel cachedData = Bank.getNow(CarModel.class, "genesis");
 
-        Assert.assertEquals("genesis", cachedData.carName);
+        Assert.assertEquals(cachedData.carName, "genesis");
         Assert.assertEquals(9987, cachedData.index);
     }
 
     @Test
     public void cacheTimeInTest(){
-        Bank.put("avante", new CarModel(9986, "avante-new"));
-        CarModel cachedData = Bank.getNow("avante", CarModel.class);
+        Bank.put(new CarModel(9986, "avante-new"), "avante");
+        CarModel cachedData = Bank.getNow(CarModel.class, "avante");
 
         Assert.assertEquals("avante-new", cachedData.carName);
         Assert.assertEquals(9986, cachedData.index);
@@ -52,9 +52,9 @@ public class MemCacheTest {
 
     @Test
     public void cacheTimeInTest2() throws Exception{
-        Bank.put("avante", new CarModel(9986, "avante-new"));
+        Bank.put(new CarModel(9986, "avante-new"), "avante");
         Thread.sleep(500);
-        CarModel cachedData = Bank.getNow("avante", CarModel.class);
+        CarModel cachedData = Bank.getNow(CarModel.class, "avante");
 
         Assert.assertEquals("avante-new", cachedData.carName);
         Assert.assertEquals(9986, cachedData.index);
@@ -62,9 +62,9 @@ public class MemCacheTest {
 
     @Test
     public void cacheTimeOutTest() throws Exception{
-        Bank.put("avante", new CarModel(9986, "avante-new"));
+        Bank.put(new CarModel(9986, "avante-new"), "avante");
         Thread.sleep(2000);
-        CarModel cachedData = Bank.getNow("avante", CarModel.class);
+        CarModel cachedData = Bank.getNow(CarModel.class, "avante");
 
         Assert.assertEquals("avante", cachedData.carName);
         Assert.assertEquals(1256, cachedData.index);
@@ -72,9 +72,9 @@ public class MemCacheTest {
 
     @Test
     public void cacheTimeOutTest2() throws Exception{
-        Bank.put("avante", new CarModel(9986, "avante-new"));
+        Bank.put(new CarModel(9986, "avante-new"), "avante");
         Thread.sleep(10000);
-        CarModel cachedData = Bank.getNow("avante", CarModel.class);
+        CarModel cachedData = Bank.getNow(CarModel.class, "avante");
 
         Assert.assertEquals("avante", cachedData.carName);
         Assert.assertEquals(1256, cachedData.index);
@@ -83,9 +83,9 @@ public class MemCacheTest {
 
     @Test
     public void dataUpdateTest(){
-        Bank.put("sonata", new CarModel(9988, "sonata-old"));
-        Bank.put("sonata", new CarModel(9989, "sonata-new"));
-        CarModel cachedData = Bank.getNow("sonata", CarModel.class);
+        Bank.put(new CarModel(9988, "sonata-old"), "sonata");
+        Bank.put(new CarModel(9989, "sonata-new"), "sonata");
+        CarModel cachedData = Bank.getNow(CarModel.class, "sonata");
 
         Assert.assertEquals("sonata-new", cachedData.carName);
         Assert.assertEquals(9989, cachedData.index);
