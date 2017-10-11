@@ -25,8 +25,8 @@ public final class Bank {
     private static int memCacheSize;
     private static int diskCacheSize;
     private static boolean isInitialized = false;
-    private static LruCache lruMemCache;
-    private static DiskLruCache lruDiskCache;
+    private static LruCache lruMemCache = null;
+    private static DiskLruCache lruDiskCache = null;
     private static CacheMode cacheMode;
 
     private Bank(Builder builder){
@@ -35,6 +35,7 @@ public final class Bank {
         this.cacheMode = builder.cacheMode;
         this.isInitialized = true;
         this.lruMemCache = new LruCache<String, CacheObject>(memCacheSize);
+        //this.lruDiskCache = DiskLruCache.open(null, 1, 2, Integer.MAX_VALUE);
     }
 
     public static boolean isInitialized(){
