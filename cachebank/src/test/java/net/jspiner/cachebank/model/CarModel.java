@@ -6,9 +6,6 @@ import net.jspiner.cachebank.DummyNetwork;
 import net.jspiner.cachebank.Provider;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.annotations.NonNull;
 
 /**
  * Created by JSpiner on 2017. 7. 13..
@@ -16,7 +13,7 @@ import io.reactivex.annotations.NonNull;
  * Contact : jspiner@naver.com
  */
 
-public class CarModel extends Provider<CarModel> {
+public class CarModel implements Provider<CarModel> {
 
     public int index;
     public String carName;
@@ -38,6 +35,11 @@ public class CarModel extends Provider<CarModel> {
     @Override
     public CarModel fetchData(String key, @Nullable CarModel prevData) {
         return DummyNetwork.requestCar(key);
+    }
+
+    @Override
+    public Observable<CarModel> fetchDataObservable(String key, @Nullable CarModel prevData) {
+        return null;
     }
 
 }

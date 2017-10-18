@@ -1,17 +1,13 @@
 package net.jspiner.cachebank;
 
 import android.support.v4.util.LruCache;
-import android.util.Log;
 
 import com.jakewharton.disklrucache.DiskLruCache;
 
 import java.io.IOException;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
 
 /**
@@ -42,7 +38,18 @@ public final class Bank {
         return isInitialized;
     }
 
-    public static <T extends ProviderInterface> Observable<T> get(Class<T> targetClass, String key){
+    public <T extends Provider> Cacheable<T> deposit(Class<T> targetClass, String key){
+        checkInitAndThrow();
+
+        return new BaseCacheable<T>(
+                targetClass,
+                key,
+                CacheableMode.DEPOSIT
+        );
+    }
+
+    @Deprecated
+    public static <T extends Provider> Observable<T> get(Class<T> targetClass, String key){
         checkInitAndThrow();
 
         return Observable.create((ObservableOnSubscribe<CacheObject>)emmiter -> {
@@ -60,7 +67,8 @@ public final class Bank {
         });
     }
 
-    public static <T extends ProviderInterface> T getNow(Class<T> targetClass, String key){
+    @Deprecated
+    public static <T extends Provider> T getNow(Class<T> targetClass, String key){
         checkInitAndThrow();
 
         CacheObject<T> cachedObject = getCacheObject(targetClass, key);
@@ -74,7 +82,8 @@ public final class Bank {
 
     }
 
-    private static <T extends ProviderInterface> CacheObject getCacheObject(Class<T> targetClass, String key){
+    @Deprecated
+    private static <T extends Provider> CacheObject getCacheObject(Class<T> targetClass, String key){
         CacheObject<T> cachedObject = getCacheObjectInCache(targetClass, key);
 
         boolean isExpired = isExpired(cachedObject);
@@ -86,7 +95,8 @@ public final class Bank {
         return cachedObject;
     }
 
-    private static <T extends ProviderInterface> CacheObject getCacheObjectInCache(Class<T> targetClass, String key){
+    @Deprecated
+    private static <T extends Provider> CacheObject getCacheObjectInCache(Class<T> targetClass, String key){
         CacheObject cachedObject = findInMemory(targetClass, key);
 
         if(cachedObject == null){
@@ -104,7 +114,8 @@ public final class Bank {
         return cachedObject;
     }
 
-    private static <T extends ProviderInterface> CacheObject findInMemory(Class<T> targetClass, String key){
+    @Deprecated
+    private static <T extends Provider> CacheObject findInMemory(Class<T> targetClass, String key){
         CacheObject<T> cachedObject = (CacheObject<T>) lruMemCache.get(key);
         if(cachedObject == null){
             return null;
@@ -115,22 +126,35 @@ public final class Bank {
         return cachedObject;
     }
 
+    @Deprecated
     // TODO : disk cache 구현하기
-    private static <T extends ProviderInterface> CacheObject findInDisk(Class<T> targetClass, String key){
+    private static <T extends Provider> CacheObject findInDisk(Class<T> targetClass, String key){
         return null;
     }
 
+    @Deprecated
     private static void registerInMemory(CacheObject cacheObject, String key){
         lruMemCache.put(cacheObject, key);
     }
 
-    public static <T extends ProviderInterface> void put(T value, String key){
+    public static <T extends Provider> BaseCacheable<T> withdrawal(T value, String key){
         checkInitAndThrow();
 
+        return new BaseCacheable<T>(
+                value,
+                key,
+                CacheableMode.WITHDRAW
+        );
+    }
+
+    @Deprecated
+    public static <T extends Provider> void put(T value, String key){
+        checkInitAndThrow();
+        // TODO : Provider가 바뀌면서 cache time이 default로 임시 변경됨. 추후 재변경 필요
         CacheObject<T> cacheObject = new CacheObject<>(
                 key,
                 value,
-                System.currentTimeMillis() + value.getCacheTime()
+                System.currentTimeMillis() + BankConstant.DEFAULT_CACHE_TIME
         );
         lruMemCache.put(key, cacheObject);
     }
@@ -147,6 +171,18 @@ public final class Bank {
         if(isInitialized() == false){
             throw new RuntimeException("You need to start it through the Bank.Builder");
         }
+    }
+
+    protected static LruCache getMemCache(){
+        checkInitAndThrow();
+
+        return lruMemCache;
+    }
+
+    protected static DiskLruCache getDiskCache(){
+        checkInitAndThrow();
+
+        return lruDiskCache;
     }
 
     public static int getMemCacheSize() {
