@@ -118,7 +118,7 @@ public final class BaseCacheable<T extends Provider> implements Cacheable<T> {
                     CacheObject<T> cacheObject = new CacheObject<>(
                             key,
                             value,
-                            System.currentTimeMillis() + BankConstant.DEFAULT_CACHE_TIME
+                            System.currentTimeMillis() + value.getCacheTime()
                     );
                     Bank.getMemCache().put(key, cacheObject);
 

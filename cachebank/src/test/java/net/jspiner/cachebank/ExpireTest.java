@@ -8,6 +8,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.concurrent.TimeUnit;
+
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 

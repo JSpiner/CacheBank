@@ -150,11 +150,10 @@ public final class Bank {
     @Deprecated
     public static <T extends Provider> void put(T value, String key){
         checkInitAndThrow();
-        // TODO : Provider가 바뀌면서 cache time이 default로 임시 변경됨. 추후 재변경 필요
         CacheObject<T> cacheObject = new CacheObject<>(
                 key,
                 value,
-                System.currentTimeMillis() + BankConstant.DEFAULT_CACHE_TIME
+                System.currentTimeMillis() + value.getCacheTime()
         );
         lruMemCache.put(key, cacheObject);
     }
