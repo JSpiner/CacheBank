@@ -1,1 +1,1 @@
-include ':app', ':cachebank'
+include ':app', ':cachebank', ':cachebank-adapters'
