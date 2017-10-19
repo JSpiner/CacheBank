@@ -1,6 +1,6 @@
 package net.jspiner.cachebank;
 
-public enum  CacheableMode {
+public enum CacheableMode {
     DEPOSIT,
     WITHDRAW
 }
