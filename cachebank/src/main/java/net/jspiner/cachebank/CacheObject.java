@@ -1,8 +1,6 @@
 package net.jspiner.cachebank;
 
 import io.reactivex.Observable;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Consumer;
 
 /**
  * Created by JSpiner on 2017. 7. 13..
@@ -10,7 +8,7 @@ import io.reactivex.functions.Consumer;
  * Contact : jspiner@naver.com
  */
 
-final class CacheObject<T extends ProviderInterface> {
+final class CacheObject<T extends Provider> {
 
     private long expireTime;
     private String key;
@@ -24,7 +22,7 @@ final class CacheObject<T extends ProviderInterface> {
         this.expireTime = expireTime;
     }
 
-    protected static <T extends ProviderInterface> CacheObject newInstance(Class<T> targetClass, String key){
+    protected static <T extends Provider> CacheObject newInstance(Class<T> targetClass, String key){
         T dataInstance = getTargetInstance(targetClass);
         T fetchedInstance = (T)dataInstance.fetchData(key, null);
 
@@ -32,10 +30,11 @@ final class CacheObject<T extends ProviderInterface> {
             fetchedInstance = dataInstance;
         }
 
+        // TODO : Provider가 바뀌면서 cache time이 default로 임시 변경됨. 추후 재변경 필요
         CacheObject cacheObject = new CacheObject<T>(
                 key,
                 fetchedInstance,
-                fetchedInstance.getCacheTime()
+                BankConstant.DEFAULT_CACHE_TIME
         );
         return cacheObject;
     }

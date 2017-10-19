@@ -4,13 +4,15 @@ import android.support.annotation.Nullable;
 
 import net.jspiner.cachebank.Provider;
 
+import io.reactivex.Observable;
+
 /**
  * Created by JSpiner on 2017. 7. 14..
  * JSpiner
  * Contact : jspiner@naver.com
  */
 
-public class AnimalModel extends Provider<AnimalModel> {
+public class AnimalModel implements Provider<AnimalModel> {
 
     public int index;
     public String animalName;
@@ -27,6 +29,11 @@ public class AnimalModel extends Provider<AnimalModel> {
 
     @Override
     public AnimalModel fetchData(String key, @Nullable AnimalModel prevData) {
+        return null;
+    }
+
+    @Override
+    public Observable<AnimalModel> fetchDataObservable(String key, @Nullable AnimalModel prevData) {
         return null;
     }
 }

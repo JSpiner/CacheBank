@@ -10,24 +10,10 @@ import io.reactivex.Observable;
  * Contact : jspiner@naver.com
  */
 
-public abstract class Provider<T> implements ProviderInterface<T> {
+public interface Provider<T> {
 
-    public Provider(){
-        super();
-    }
+    int getCacheTime();
+    T fetchData(String key, @Nullable T prevData);
+    Observable<T> fetchDataObservable(String key, @Nullable T prevData);
 
-    @Override
-    public int getCacheTime() {
-        return BankConstant.DEFAULT_CACHE_TIME;
-    }
-
-    @Override
-    public T fetchData(String key, @Nullable T prevData) {
-        return null;
-    }
-
-    @Override
-    public Observable<T> fetchDataObservable(String key, @Nullable T prevData) {
-        return null;
-    }
 }
