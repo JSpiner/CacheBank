@@ -7,14 +7,16 @@ CacheBank
 
 CacheBank is rx based android memory-disk cache library
 
-(will) supporting mem/disk cache
+supporting mem/disk cache
 
 # STILL DEVELOPING!!
-will support...
+now support 
 - RxJava
-- Disk Cache
+- Mem LRUCache
+
+will support...
+- Disk Cache(Dual mode)
 - Cache Option
-ASAP....
 
 Cache flow
 -----------------------
@@ -42,18 +44,16 @@ new Bank.Builder()
 Define DataModel
 ----------------
 ```java
-class CarModel extends Provider<CarModel> {
+class CarModel implements Provider<CarModel> {
 
     public int index;
     public String carName;
 
-    //optional, if you don't override, use default
     @Override
     public int getCacheTime() {
         return 1 * 1000;
     }
 
-    //you can choose in below
     @Override
     public CarModel fetchData(String key, CarModel prevData) {
         return yourFetchDataFunction(key);
@@ -73,7 +73,7 @@ Get Data(sync)
 ```java
 
 void setItemLayout(String carId){
-    CarModel carModel = Bank.getNow(carId, CarModel.class);
+    CarModel carModel = Bank.withdraw(carId, CarModel.class).now();
 
     textView.setText(carModel.carName);
     ...
@@ -86,7 +86,7 @@ Get Data Using Observable(async)
 ```java
 
 void setItemLayout(String carId){
-    Observable<CarModel> carObservable = Bank.get(carId, CarModel.class);
+    Observable<CarModel> carObservable = Bank.withdraw(carId, CarModel.class).rx();
     carObservable.subscribe(carModel -> {
             textView.setText(carModel.carName);
         }
@@ -94,14 +94,40 @@ void setItemLayout(String carId){
     ...
 }
 
+//or more simply
+void setItemLayoutSimply(String carId){
+    Bank.withdraw(carId, CarModel.class)
+        .subscribe(carModel -> {
+                textView.setText(carModel.carName);
+            }
+        );
+}
+
 ```
 
 
-Put Data
+Put Data(sync)
 ------------------------
 ```java
 void networkResponseCallback(String carId, CarModel carModel){
-    Bank.put(carId, carModel);
+    Bank.deposit(carId, carModel).now();
+}
+
+```
+
+
+
+Put Data(async)
+------------------------
+```java
+void networkResponseCallback(String carId, CarModel carModel){
+    Observable putObservable = Bank.deposit(carId, carModel).rx();
+    putObservable.subscribe(__ -> Logger.i("saved!"));
+}
+
+//or more simply
+void networkResponseCallbackSimply(String carId, CarModel carModel){
+    Bank.deposit(carId, carModel).subscribe(__ -> Logger.i("saved!"));
 }
 
 ```
