@@ -1,5 +1,7 @@
 package net.jspiner.cachebank;
 
+import android.util.Log;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.Disposable;
@@ -51,16 +53,18 @@ public final class BaseCacheable<T extends Provider> implements Cacheable<T> {
         }
     }
 
-    private Observable withdraw(){
+    private Observable<T> deposit(){
         return Observable.create((ObservableOnSubscribe<CacheObject>) emmiter -> {
             CacheObject<T> cachedObject = getCacheObject(targetClass, key);
 
+            if(cachedObject == null){
+                throw new NullPointerException("cannot update new data");
+            }
             emmiter.onNext(cachedObject);
             emmiter.onComplete();
 
-        }).flatMap((Function<CacheObject, Observable<T>>) cacheObject -> cacheObject.getValueObservable());
+        }).flatMap(cacheObject -> cacheObject.getValueObservable());
     }
-
 
     private <T extends Provider> CacheObject getCacheObject(Class<T> targetClass, String key){
         CacheObject<T> cachedObject = getCacheObjectInCache(targetClass, key);
@@ -112,7 +116,7 @@ public final class BaseCacheable<T extends Provider> implements Cacheable<T> {
         Bank.getMemCache().put(cacheObject, key);
     }
 
-    private Observable deposit(){
+    private Observable withdraw(){
         return Observable.create(
                 emitter -> {
                     CacheObject<T> cacheObject = new CacheObject<>(
@@ -122,7 +126,7 @@ public final class BaseCacheable<T extends Provider> implements Cacheable<T> {
                     );
                     Bank.getMemCache().put(key, cacheObject);
 
-                    emitter.onNext(Observable.empty());
+                    emitter.onNext(value);
                     emitter.onComplete();
                 }
         );

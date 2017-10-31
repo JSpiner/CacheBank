@@ -38,7 +38,7 @@ public final class Bank {
         return isInitialized;
     }
 
-    public <T extends Provider> Cacheable<T> deposit(Class<T> targetClass, String key){
+    public static <T extends Provider> Cacheable<T> deposit(Class<T> targetClass, String key){
         checkInitAndThrow();
 
         return new BaseCacheable<T>(
@@ -59,7 +59,7 @@ public final class Bank {
             emmiter.onNext(cachedObject);
             emmiter.onComplete();
 
-        }).flatMap((Function<CacheObject, Observable<T>>)cacheObject -> {
+        }).flatMap(cacheObject -> {
             if(cacheObject.isObservable()){
                 return cacheObject.getValueObservable();
             }
