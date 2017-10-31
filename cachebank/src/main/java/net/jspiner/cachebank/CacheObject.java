@@ -64,6 +64,11 @@ final class CacheObject<T extends Provider> {
     }
 
     protected Observable getValueObservable(){
+        if(valueObservable == null){
+            return Observable.create(
+                    emitter -> emitter.onNext(value)
+            );
+        }
         return valueObservable;
     }
 

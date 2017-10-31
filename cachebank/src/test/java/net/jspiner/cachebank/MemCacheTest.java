@@ -91,4 +91,16 @@ public class MemCacheTest {
         Assert.assertEquals(9989, cachedData.index);
     }
 
+    @Test
+    public void dataDepositTest(){
+        Bank.withdrawal(
+                new CarModel(9987, "genesis"),
+                "genesis"
+        ).now();
+        CarModel cachedData = Bank.deposit(CarModel.class, "genesis").now();
+
+        Assert.assertEquals(cachedData.carName, "genesis");
+        Assert.assertEquals(9987, cachedData.index);
+    }
+
 }
