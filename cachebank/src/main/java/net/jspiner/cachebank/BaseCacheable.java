@@ -2,6 +2,8 @@ package net.jspiner.cachebank;
 
 import android.util.Log;
 
+import java.util.NoSuchElementException;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.Disposable;
@@ -30,7 +32,13 @@ public final class BaseCacheable<K, T> implements Cacheable<K, T> {
 
     @Override
     public T now() {
-        return getCacheObservable().blockingFirst();
+        try {
+            return getCacheObservable().blockingFirst();
+        }
+        catch (NoSuchElementException exception){
+            // observable return nothing
+            return null;
+        }
     }
 
     @Override
@@ -60,7 +68,7 @@ public final class BaseCacheable<K, T> implements Cacheable<K, T> {
         }
     }
 
-    private Observable<T> deposit() {
+    private Observable<T> withdraw() {
         return Observable.create((ObservableOnSubscribe<CacheObject>) emmiter -> {
             CacheObject<K, T> cachedObject = getCacheObject(targetClass, key);
 
@@ -73,13 +81,13 @@ public final class BaseCacheable<K, T> implements Cacheable<K, T> {
         }).flatMap(cacheObject -> cacheObject.getValueObservable());
     }
 
-    private <T, K> CacheObject getCacheObject(Class<T> targetClass, K key) {
+    private CacheObject getCacheObject(Class<T> targetClass, K key) {
         CacheObject<K, T> cachedObject = getCacheObjectInCache(targetClass, key);
 
         boolean isExpired = isExpired(cachedObject);
 
-        if (isExpired) {
-            cachedObject.update(key);
+        if (isExpired && dataSource != null) {
+            cachedObject.update(key, dataSource);
         }
 
         return cachedObject;
@@ -123,14 +131,14 @@ public final class BaseCacheable<K, T> implements Cacheable<K, T> {
         Bank.getMemCache().put(cacheObject, key);
     }
 
-    private Observable withdraw() {
+    private Observable deposit() {
         // TODO : default 시간이 아닌 캐시모듈별 시간으로 처리하도록 구현 필요
         return Observable.create(
                 emitter -> {
                     CacheObject<K, T> cacheObject = new CacheObject<>(
                             key,
                             value,
-                            System.currentTimeMillis() * 2 /*+ value.getCacheTime()*/
+                            System.currentTimeMillis() + 1000
                     );
                     Bank.getMemCache().put(key, cacheObject);
 

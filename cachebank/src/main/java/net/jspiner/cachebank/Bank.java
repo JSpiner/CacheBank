@@ -40,125 +40,24 @@ public final class Bank {
         return isInitialized;
     }
 
-    public static <K, T> Cacheable<K, T> deposit(Class<T> targetClass, K key) {
+    public static <K, T> Cacheable<K, T> withdrawal(Class<T> targetClass, K key) {
         checkInitAndThrow();
 
         return new BaseCacheable(
                 targetClass,
                 key,
-                CacheableMode.DEPOSIT
+                CacheableMode.WITHDRAW
         );
     }
 
-    @Deprecated
-    public static <K, T> Observable<T> get(Class<T> targetClass, K key) {
-        checkInitAndThrow();
-
-        return Observable.create((ObservableOnSubscribe<CacheObject<K, T>>) emmiter -> {
-
-            CacheObject<K, T> cachedObject = getCacheObject(targetClass, key);
-
-            emmiter.onNext(cachedObject);
-            emmiter.onComplete();
-
-        }).flatMap(cacheObject -> {
-            if (cacheObject.isObservable()) {
-                return cacheObject.getValueObservable();
-            }
-            return Observable.just(cacheObject.getValue());
-        });
-    }
-
-    @Deprecated
-    public static <K, T> T getNow(Class<T> targetClass, K key) {
-        checkInitAndThrow();
-
-        CacheObject<K, T> cachedObject = getCacheObject(targetClass, key);
-
-        if (cachedObject.isObservable()) {
-            return (T) cachedObject.getValueObservable().blockingFirst();
-        }
-        else {
-            return cachedObject.getValue();
-        }
-
-    }
-
-    @Deprecated
-    private static <K, T> CacheObject getCacheObject(Class<T> targetClass, K key) {
-        CacheObject<K, T> cachedObject = getCacheObjectInCache(targetClass, key);
-
-        boolean isExpired = isExpired(cachedObject);
-
-        if (isExpired) {
-            cachedObject.update(key);
-        }
-
-        return cachedObject;
-    }
-
-    @Deprecated
-    private static <K, T> CacheObject getCacheObjectInCache(Class<T> targetClass, K key) {
-        CacheObject cachedObject = findInMemory(targetClass, key);
-
-        if (cachedObject == null) {
-            cachedObject = findInDisk(targetClass, key);
-
-            if (cachedObject != null) {
-                registerInMemory(cachedObject, key);
-            }
-        }
-
-        if (cachedObject == null) {
-            cachedObject = CacheObject.newInstance(targetClass, key);
-        }
-
-        return cachedObject;
-    }
-
-    @Deprecated
-    private static <K, T> CacheObject findInMemory(Class<T> targetClass, K key) {
-        CacheObject<K, T> cachedObject = (CacheObject<K, T>) lruMemCache.get(key);
-        if (cachedObject == null) {
-            return null;
-        }
-        if (!cachedObject.getValue().getClass().equals(targetClass)) {
-            throw new ClassCastException();
-        }
-        return cachedObject;
-    }
-
-    @Deprecated
-    // TODO : disk cache 구현하기
-    private static <K, T> CacheObject findInDisk(Class<T> targetClass, K key) {
-        return null;
-    }
-
-    @Deprecated
-    private static <K> void registerInMemory(CacheObject cacheObject, K key) {
-        lruMemCache.put(cacheObject, key);
-    }
-
-    public static <K, T> BaseCacheable<K, T> withdrawal(T value, K key) {
+    public static <K, T> Cacheable<K, T> deposit(T value, K key) {
         checkInitAndThrow();
 
         return new BaseCacheable<K, T>(
                 value,
                 key,
-                CacheableMode.WITHDRAW
+                CacheableMode.DEPOSIT
         );
-    }
-
-    @Deprecated
-    public static <K, T> void put(T value, K key) {
-        checkInitAndThrow();
-        // TODO : default 시간이 아닌 캐시모듈별 시간으로 처리하도록 구현 필요
-        CacheObject<K, T> cacheObject = new CacheObject<>(
-                key,
-                value,
-                System.currentTimeMillis() + defaultCacheTimeInMillis
-        );
-        lruMemCache.put(key, cacheObject);
     }
 
     private static boolean isExpired(CacheObject cacheObject) {

@@ -32,13 +32,13 @@ public class ObservableProviderTest {
 
     @Test
     public void dataObjectReturnClassTypeTest(){
-        Object object = Bank.get(FoodModel.class, "pizza");
+        Object object = Bank.withdrawal(FoodModel.class, "pizza").rx();
         Assert.assertThat(object, instanceOf(Observable.class));
     }
 
     @Test
     public void emptyDataObjectReturnTest(){
-        Observable<FoodModel> dataObservable = Bank.get(FoodModel.class, "garbage");
+        Observable<FoodModel> dataObservable = Bank.withdrawal(FoodModel.class, "garbage").rx();
         dataObservable.subscribe(foodModel -> {
             Assert.assertNull(foodModel);
         });
@@ -46,7 +46,7 @@ public class ObservableProviderTest {
 
     @Test
     public void dataReturnValueTest(){
-        Observable<FoodModel> dataObservable = Bank.get(FoodModel.class, "pizza");
+        Observable<FoodModel> dataObservable = Bank.withdrawal(FoodModel.class, "pizza").rx();
 
         dataObservable.subscribe(foodModel -> {
             Assert.assertEquals("pizza", foodModel.foodName);
@@ -57,8 +57,8 @@ public class ObservableProviderTest {
     @Test
     public void dataUpdateReturnValueTest(){
         Observable<FoodModel> cachedData;
-        cachedData = Bank.get(FoodModel.class, "burger");
-        cachedData = Bank.get(FoodModel.class, "pizza");
+        cachedData = Bank.withdrawal(FoodModel.class, "burger").rx();
+        cachedData = Bank.withdrawal(FoodModel.class, "pizza").rx();
 
         cachedData.subscribe(foodModel -> {
             Assert.assertEquals("pizza", foodModel.foodName);

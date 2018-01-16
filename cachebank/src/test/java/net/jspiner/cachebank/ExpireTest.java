@@ -1,5 +1,6 @@
 package net.jspiner.cachebank;
 
+import net.jspiner.cachebank.datasource.CarDataSource;
 import net.jspiner.cachebank.model.CarModel;
 import net.jspiner.cachebank.model.FoodModel;
 
@@ -40,11 +41,12 @@ public class ExpireTest {
 
     @Test
     public void expireTest() throws InterruptedException {
-        Bank.put(new CarModel(9986, "avante-new"), "avante");
+        Bank.deposit(new CarModel(9986, "avante-new"), "avante").now();
 
         Thread.sleep(1000 * 2);
 
-        CarModel carModel = Bank.getNow(CarModel.class, "avante");
+        CarModel carModel = Bank.withdrawal(CarModel.class, "avante")
+                .dataSource(new CarDataSource()).now();
 
         Assert.assertEquals(
                 carModel.index,
@@ -59,11 +61,11 @@ public class ExpireTest {
 
     @Test
     public void notExpireTest() throws InterruptedException {
-        Bank.put(new CarModel(9986, "avante-new"), "avante");
+        Bank.deposit(new CarModel(9986, "avante-new"), "avante").now();
 
         Thread.sleep(500);
 
-        CarModel carModel = Bank.getNow(CarModel.class, "avante");
+        CarModel carModel = Bank.withdrawal(CarModel.class, "avante").now();
 
         Assert.assertEquals(
                 carModel.index,
@@ -78,8 +80,8 @@ public class ExpireTest {
 
     @Test
     public void observableExpireTest() throws InterruptedException {
-        Bank.put(new FoodModel(5555, "hamburger"), "burger");
-        Bank.get(FoodModel.class, "burger").subscribe(
+        Bank.deposit(new FoodModel(5555, "hamburger"), "burger").now();
+        Bank.withdrawal(FoodModel.class, "burger").subscribe(
                 foodModel -> {
 
                 }
@@ -87,7 +89,7 @@ public class ExpireTest {
 
         Thread.sleep(1000 * 10);
 
-        Bank.get(FoodModel.class, "burger").subscribe(
+        Bank.withdrawal(FoodModel.class, "burger").subscribe(
                 foodModel -> {
                     Assert.assertEquals(foodModel.index, 2311);
                     Assert.assertEquals(foodModel.foodName, "burger");

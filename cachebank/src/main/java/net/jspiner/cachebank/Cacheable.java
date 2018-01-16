@@ -14,6 +14,6 @@ public interface Cacheable<K, T> {
 
     Disposable subscribe(Consumer<T> consumer);
 
-    Cacheable dataSource(DataSource<K, T> dataSource);
+    Cacheable<K, T> dataSource(DataSource<K, T> dataSource);
 
 }

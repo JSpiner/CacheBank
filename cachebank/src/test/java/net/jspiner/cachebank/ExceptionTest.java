@@ -37,9 +37,9 @@ public class ExceptionTest {
 
     @Test
     public void classCastExceptionTest(){
-        Bank.put(new CarModel(1933, "sonata-new"), "sonata");
+        Bank.deposit(new CarModel(1933, "sonata-new"), "sonata").now();
         try {
-            Bank.getNow(FoodModel.class, "sonata");
+            Bank.withdrawal(FoodModel.class, "sonata").now();
         }catch (Exception e){
             Assert.assertEquals(ClassCastException.class, e.getClass());
 
@@ -47,30 +47,4 @@ public class ExceptionTest {
         }
         Assert.fail();
     }
-
-    @Test
-    public void instantiationExceptionTest(){
-        try {
-            Bank.getNow(AnimalModel.class, "monky");
-        } catch (Exception e){
-            Assert.assertEquals(InstantiationException.class, e.getCause().getClass());
-            return;
-        }
-
-        Assert.fail();
-    }
-
-    @Test
-    public void illegalAccessExceptionTest(){
-        try {
-            Bank.getNow(GunModel.class, "bereta");
-        } catch (Exception e){
-            Assert.assertEquals(IllegalAccessException.class, e.getCause().getClass());
-
-            return;
-        }
-
-        Assert.fail();
-    }
-
 }

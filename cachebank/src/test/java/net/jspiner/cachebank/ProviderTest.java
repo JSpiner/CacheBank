@@ -1,5 +1,6 @@
 package net.jspiner.cachebank;
 
+import net.jspiner.cachebank.datasource.CarDataSource;
 import net.jspiner.cachebank.model.CarModel;
 
 import org.junit.Assert;
@@ -24,19 +25,20 @@ public class ProviderTest {
 
     @Test
     public void dataObjectReturnClassTypeTest(){
-        Object object = Bank.getNow(CarModel.class, "sonata");
-        Assert.assertEquals(object.getClass(), CarModel.class);
+        Object object = Bank.withdrawal(CarModel.class, "sonata");
+        Assert.assertEquals(object.getClass(), BaseCacheable.class);
     }
 
     @Test
     public void emptyDataObjectReturnTest(){
-        Object object = Bank.getNow(CarModel.class, "garbage");
+        Object object = Bank.withdrawal(CarModel.class, "garbage").now();
         Assert.assertNull(object);
     }
 
     @Test
     public void dataReturnValueTest(){
-        CarModel cachedData = Bank.getNow(CarModel.class, "sonata");
+        CarModel cachedData = Bank.withdrawal(CarModel.class, "sonata")
+                .dataSource(new CarDataSource()).now();
 
         Assert.assertEquals("sonata", cachedData.carName);
         Assert.assertEquals(1255, cachedData.index);
@@ -45,8 +47,10 @@ public class ProviderTest {
     @Test
     public void dataUpdateReturnValueTest(){
         CarModel cachedData;
-        cachedData = Bank.getNow(CarModel.class, "sonata");
-        cachedData = Bank.getNow(CarModel.class, "avante");
+        cachedData = Bank.withdrawal(CarModel.class, "sonata")
+                .dataSource(new CarDataSource()).now();
+        cachedData = Bank.withdrawal(CarModel.class, "avante")
+                .dataSource(new CarDataSource()).now();
 
         Assert.assertEquals("avante", cachedData.carName);
         Assert.assertEquals(1256, cachedData.index);

@@ -1,5 +1,6 @@
 package net.jspiner.cachebank;
 
+import net.jspiner.cachebank.datasource.CarDataSource;
 import net.jspiner.cachebank.model.CarModel;
 
 import org.junit.After;
@@ -34,8 +35,9 @@ public class MemCacheTest {
 
     @Test
     public void dataLoadTest(){
-        Bank.put(new CarModel(9987, "genesis"), "genesis");
-        CarModel cachedData = Bank.getNow(CarModel.class, "genesis");
+        Bank.deposit(new CarModel(9987, "genesis"), "genesis").now();
+        CarModel cachedData = Bank.withdrawal(CarModel.class, "genesis")
+                .dataSource(new CarDataSource()).now();
 
         Assert.assertEquals(cachedData.carName, "genesis");
         Assert.assertEquals(9987, cachedData.index);
@@ -43,8 +45,9 @@ public class MemCacheTest {
 
     @Test
     public void cacheTimeInTest(){
-        Bank.put(new CarModel(9986, "avante-new"), "avante");
-        CarModel cachedData = Bank.getNow(CarModel.class, "avante");
+        Bank.deposit(new CarModel(9986, "avante-new"), "avante").now();
+        CarModel cachedData = Bank.withdrawal(CarModel.class, "avante")
+                .dataSource(new CarDataSource()).now();
 
         Assert.assertEquals("avante-new", cachedData.carName);
         Assert.assertEquals(9986, cachedData.index);
@@ -52,9 +55,10 @@ public class MemCacheTest {
 
     @Test
     public void cacheTimeInTest2() throws Exception{
-        Bank.put(new CarModel(9986, "avante-new"), "avante");
+        Bank.deposit(new CarModel(9986, "avante-new"), "avante").now();
         Thread.sleep(500);
-        CarModel cachedData = Bank.getNow(CarModel.class, "avante");
+        CarModel cachedData = Bank.withdrawal(CarModel.class, "avante")
+                .dataSource(new CarDataSource()).now();
 
         Assert.assertEquals("avante-new", cachedData.carName);
         Assert.assertEquals(9986, cachedData.index);
@@ -62,9 +66,10 @@ public class MemCacheTest {
 
     @Test
     public void cacheTimeOutTest() throws Exception{
-        Bank.put(new CarModel(9986, "avante-new"), "avante");
+        Bank.deposit(new CarModel(9986, "avante-new"), "avante").now();
         Thread.sleep(2000);
-        CarModel cachedData = Bank.getNow(CarModel.class, "avante");
+        CarModel cachedData = Bank.withdrawal(CarModel.class, "avante")
+                .dataSource(new CarDataSource()).now();
 
         Assert.assertEquals("avante", cachedData.carName);
         Assert.assertEquals(1256, cachedData.index);
@@ -72,9 +77,10 @@ public class MemCacheTest {
 
     @Test
     public void cacheTimeOutTest2() throws Exception{
-        Bank.put(new CarModel(9986, "avante-new"), "avante");
+        Bank.deposit(new CarModel(9986, "avante-new"), "avante").now();
         Thread.sleep(10000);
-        CarModel cachedData = Bank.getNow(CarModel.class, "avante");
+        CarModel cachedData = Bank.withdrawal(CarModel.class, "avante")
+                .dataSource(new CarDataSource()).now();
 
         Assert.assertEquals("avante", cachedData.carName);
         Assert.assertEquals(1256, cachedData.index);
@@ -83,9 +89,10 @@ public class MemCacheTest {
 
     @Test
     public void dataUpdateTest(){
-        Bank.put(new CarModel(9988, "sonata-old"), "sonata");
-        Bank.put(new CarModel(9989, "sonata-new"), "sonata");
-        CarModel cachedData = Bank.getNow(CarModel.class, "sonata");
+        Bank.deposit(new CarModel(9988, "sonata-old"), "sonata").now();
+        Bank.deposit(new CarModel(9989, "sonata-new"), "sonata").now();
+        CarModel cachedData = Bank.withdrawal(CarModel.class, "sonata")
+                .dataSource(new CarDataSource()).now();
 
         Assert.assertEquals("sonata-new", cachedData.carName);
         Assert.assertEquals(9989, cachedData.index);
@@ -93,11 +100,12 @@ public class MemCacheTest {
 
     @Test
     public void dataDepositTest(){
-        Bank.withdrawal(
+        Bank.deposit(
                 new CarModel(9987, "genesis"),
                 "genesis"
         ).now();
-        CarModel cachedData = Bank.deposit(CarModel.class, "genesis").now();
+        CarModel cachedData = Bank.withdrawal(CarModel.class, "genesis")
+                .dataSource(new CarDataSource()).now();
 
         Assert.assertEquals(cachedData.carName, "genesis");
         Assert.assertEquals(9987, cachedData.index);
