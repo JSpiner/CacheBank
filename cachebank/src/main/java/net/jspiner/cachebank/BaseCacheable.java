@@ -8,7 +8,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
-public final class BaseCacheable<T extends Provider> implements Cacheable<T> {
+public final class BaseCacheable<T> implements Cacheable<T> {
 
     private Class<T> targetClass;
     private String key;
@@ -66,7 +66,7 @@ public final class BaseCacheable<T extends Provider> implements Cacheable<T> {
         }).flatMap(cacheObject -> cacheObject.getValueObservable());
     }
 
-    private <T extends Provider> CacheObject getCacheObject(Class<T> targetClass, String key){
+    private <T> CacheObject getCacheObject(Class<T> targetClass, String key){
         CacheObject<T> cachedObject = getCacheObjectInCache(targetClass, key);
 
         boolean isExpired = isExpired(cachedObject);
@@ -78,7 +78,7 @@ public final class BaseCacheable<T extends Provider> implements Cacheable<T> {
         return cachedObject;
     }
 
-    private <T extends Provider> CacheObject getCacheObjectInCache(Class<T> targetClass, String key){
+    private <T> CacheObject getCacheObjectInCache(Class<T> targetClass, String key){
         CacheObject cachedObject = findInMemory(targetClass, key);
 
         if(cachedObject == null){
@@ -96,7 +96,7 @@ public final class BaseCacheable<T extends Provider> implements Cacheable<T> {
         return cachedObject;
     }
 
-    private <T extends Provider> CacheObject findInMemory(Class<T> targetClass, String key){
+    private <T> CacheObject findInMemory(Class<T> targetClass, String key){
         CacheObject<T> cachedObject = (CacheObject<T>) Bank.getMemCache().get(key);
         if(cachedObject == null){
             return null;
@@ -108,7 +108,7 @@ public final class BaseCacheable<T extends Provider> implements Cacheable<T> {
     }
 
     // TODO : disk cache 구현하기
-    private static <T extends Provider> CacheObject findInDisk(Class<T> targetClass, String key){
+    private static <T> CacheObject findInDisk(Class<T> targetClass, String key){
         return null;
     }
 
@@ -117,12 +117,13 @@ public final class BaseCacheable<T extends Provider> implements Cacheable<T> {
     }
 
     private Observable withdraw(){
+        // TODO : default 시간이 아닌 캐시모듈별 시간으로 처리하도록 구현 필요
         return Observable.create(
                 emitter -> {
                     CacheObject<T> cacheObject = new CacheObject<>(
                             key,
                             value,
-                            System.currentTimeMillis() + value.getCacheTime()
+                            System.currentTimeMillis() * 2 /*+ value.getCacheTime()*/
                     );
                     Bank.getMemCache().put(key, cacheObject);
 

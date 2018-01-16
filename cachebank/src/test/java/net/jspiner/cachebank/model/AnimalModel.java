@@ -2,8 +2,6 @@ package net.jspiner.cachebank.model;
 
 import android.support.annotation.Nullable;
 
-import net.jspiner.cachebank.Provider;
-
 import io.reactivex.Observable;
 
 /**
@@ -12,7 +10,7 @@ import io.reactivex.Observable;
  * Contact : jspiner@naver.com
  */
 
-public class AnimalModel implements Provider<AnimalModel> {
+public class AnimalModel {
 
     public int index;
     public String animalName;
@@ -20,20 +18,5 @@ public class AnimalModel implements Provider<AnimalModel> {
     public AnimalModel(int index, String animalName){
         this.index = index;
         this.animalName = animalName;
-    }
-
-    @Override
-    public int getCacheTime() {
-        return 500;
-    }
-
-    @Override
-    public AnimalModel fetchData(String key, @Nullable AnimalModel prevData) {
-        return null;
-    }
-
-    @Override
-    public Observable<AnimalModel> fetchDataObservable(String key, @Nullable AnimalModel prevData) {
-        return null;
     }
 }

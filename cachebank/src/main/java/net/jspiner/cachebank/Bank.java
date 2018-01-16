@@ -24,24 +24,26 @@ public final class Bank {
     private static LruCache lruMemCache = null;
     private static DiskLruCache lruDiskCache = null;
     private static CacheMode cacheMode;
+    private static long defaultCacheTimeInMillis;
 
-    private Bank(Builder builder){
+    private Bank(Builder builder) {
         this.memCacheSize = builder.memCacheSize;
         this.diskCacheSize = builder.diskCacheSize;
         this.cacheMode = builder.cacheMode;
         this.isInitialized = true;
         this.lruMemCache = new LruCache<String, CacheObject>(memCacheSize);
         //this.lruDiskCache = DiskLruCache.open(null, 1, 2, Integer.MAX_VALUE);
+        this.defaultCacheTimeInMillis = builder.defaultCacheTimeMillis;
     }
 
-    public static boolean isInitialized(){
+    public static boolean isInitialized() {
         return isInitialized;
     }
 
-    public static <T extends Provider> Cacheable<T> deposit(Class<T> targetClass, String key){
+    public static <T> Cacheable<T> deposit(Class<T> targetClass, String key) {
         checkInitAndThrow();
 
-        return new BaseCacheable<T>(
+        return new BaseCacheable(
                 targetClass,
                 key,
                 CacheableMode.DEPOSIT
@@ -49,10 +51,10 @@ public final class Bank {
     }
 
     @Deprecated
-    public static <T extends Provider> Observable<T> get(Class<T> targetClass, String key){
+    public static <T> Observable<T> get(Class<T> targetClass, String key) {
         checkInitAndThrow();
 
-        return Observable.create((ObservableOnSubscribe<CacheObject>)emmiter -> {
+        return Observable.create((ObservableOnSubscribe<CacheObject<T>>) emmiter -> {
 
             CacheObject<T> cachedObject = getCacheObject(targetClass, key);
 
@@ -60,35 +62,35 @@ public final class Bank {
             emmiter.onComplete();
 
         }).flatMap(cacheObject -> {
-            if(cacheObject.isObservable()){
+            if (cacheObject.isObservable()) {
                 return cacheObject.getValueObservable();
             }
-            return Observable.just((T)cacheObject.getValue());
+            return Observable.just(cacheObject.getValue());
         });
     }
 
     @Deprecated
-    public static <T extends Provider> T getNow(Class<T> targetClass, String key){
+    public static <T> T getNow(Class<T> targetClass, String key) {
         checkInitAndThrow();
 
         CacheObject<T> cachedObject = getCacheObject(targetClass, key);
 
-        if(cachedObject.isObservable()){
-            return (T)cachedObject.getValueObservable().blockingFirst();
+        if (cachedObject.isObservable()) {
+            return (T) cachedObject.getValueObservable().blockingFirst();
         }
-        else{
+        else {
             return cachedObject.getValue();
         }
 
     }
 
     @Deprecated
-    private static <T extends Provider> CacheObject getCacheObject(Class<T> targetClass, String key){
+    private static <T> CacheObject getCacheObject(Class<T> targetClass, String key) {
         CacheObject<T> cachedObject = getCacheObjectInCache(targetClass, key);
 
         boolean isExpired = isExpired(cachedObject);
 
-        if(isExpired){
+        if (isExpired) {
             cachedObject.update(key);
         }
 
@@ -96,18 +98,18 @@ public final class Bank {
     }
 
     @Deprecated
-    private static <T extends Provider> CacheObject getCacheObjectInCache(Class<T> targetClass, String key){
+    private static <T> CacheObject getCacheObjectInCache(Class<T> targetClass, String key) {
         CacheObject cachedObject = findInMemory(targetClass, key);
 
-        if(cachedObject == null){
+        if (cachedObject == null) {
             cachedObject = findInDisk(targetClass, key);
 
-            if(cachedObject != null){
+            if (cachedObject != null) {
                 registerInMemory(cachedObject, key);
             }
         }
 
-        if(cachedObject == null){
+        if (cachedObject == null) {
             cachedObject = CacheObject.newInstance(targetClass, key);
         }
 
@@ -115,12 +117,12 @@ public final class Bank {
     }
 
     @Deprecated
-    private static <T extends Provider> CacheObject findInMemory(Class<T> targetClass, String key){
+    private static <T> CacheObject findInMemory(Class<T> targetClass, String key) {
         CacheObject<T> cachedObject = (CacheObject<T>) lruMemCache.get(key);
-        if(cachedObject == null){
+        if (cachedObject == null) {
             return null;
         }
-        if(!cachedObject.getValue().getClass().equals(targetClass)){
+        if (!cachedObject.getValue().getClass().equals(targetClass)) {
             throw new ClassCastException();
         }
         return cachedObject;
@@ -128,16 +130,16 @@ public final class Bank {
 
     @Deprecated
     // TODO : disk cache 구현하기
-    private static <T extends Provider> CacheObject findInDisk(Class<T> targetClass, String key){
+    private static <T> CacheObject findInDisk(Class<T> targetClass, String key) {
         return null;
     }
 
     @Deprecated
-    private static void registerInMemory(CacheObject cacheObject, String key){
+    private static void registerInMemory(CacheObject cacheObject, String key) {
         lruMemCache.put(cacheObject, key);
     }
 
-    public static <T extends Provider> BaseCacheable<T> withdrawal(T value, String key){
+    public static <T> BaseCacheable<T> withdrawal(T value, String key) {
         checkInitAndThrow();
 
         return new BaseCacheable<T>(
@@ -148,37 +150,38 @@ public final class Bank {
     }
 
     @Deprecated
-    public static <T extends Provider> void put(T value, String key){
+    public static <T> void put(T value, String key) {
         checkInitAndThrow();
+        // TODO : default 시간이 아닌 캐시모듈별 시간으로 처리하도록 구현 필요
         CacheObject<T> cacheObject = new CacheObject<>(
                 key,
                 value,
-                System.currentTimeMillis() + value.getCacheTime()
+                System.currentTimeMillis() + defaultCacheTimeInMillis
         );
         lruMemCache.put(key, cacheObject);
     }
 
-    private static boolean isExpired(CacheObject cacheObject){
+    private static boolean isExpired(CacheObject cacheObject) {
         long currentTime = System.currentTimeMillis();
-        if(cacheObject.getExpireTime() < currentTime){
+        if (cacheObject.getExpireTime() < currentTime) {
             return true;
         }
         return false;
     }
 
-    private static void checkInitAndThrow(){
-        if(isInitialized() == false){
+    private static void checkInitAndThrow() {
+        if (isInitialized() == false) {
             throw new RuntimeException("You need to start it through the Bank.Builder");
         }
     }
 
-    protected static LruCache getMemCache(){
+    protected static LruCache getMemCache() {
         checkInitAndThrow();
 
         return lruMemCache;
     }
 
-    protected static DiskLruCache getDiskCache(){
+    protected static DiskLruCache getDiskCache() {
         checkInitAndThrow();
 
         return lruDiskCache;
@@ -202,20 +205,20 @@ public final class Bank {
         return cacheMode;
     }
 
-    public static void clear(){
+    public static void clear() {
         checkInitAndThrow();
 
         clearDiskCache();
         clearMemoryCache();
     }
 
-    private static void clearMemoryCache(){
+    private static void clearMemoryCache() {
         lruMemCache.evictAll();
     }
 
-    private static void clearDiskCache(){
+    private static void clearDiskCache() {
         try {
-            if(lruDiskCache != null) {
+            if (lruDiskCache != null) {
                 lruDiskCache.delete();
             }
         } catch (IOException e) {
@@ -224,7 +227,7 @@ public final class Bank {
         }
     }
 
-    public static void terminate(){
+    public static void terminate() {
         checkInitAndThrow();
 
         clear();
@@ -237,14 +240,16 @@ public final class Bank {
         private int memCacheSize;
         private int diskCacheSize;
         private CacheMode cacheMode;
+        private long defaultCacheTimeMillis;
 
-        public Builder(){
+        public Builder() {
             memCacheSize = BankConstant.DEFAULT_MEM_CACHE_SIZE;
             diskCacheSize = BankConstant.DEFAULT_DISK_CACHE_SIZE;
             cacheMode = BankConstant.DEFAULT_CACHE_MODE;
+            defaultCacheTimeMillis = BankConstant.DEFAULT_CACHE_TIME;
         }
 
-        public Bank init(){
+        public Bank init() {
             return new Bank(this);
         }
 
@@ -258,8 +263,13 @@ public final class Bank {
             return this;
         }
 
-        public Builder setCacheMode(CacheMode cacheMode){
+        public Builder setCacheMode(CacheMode cacheMode) {
             this.cacheMode = cacheMode;
+            return this;
+        }
+
+        public Builder setDefaultCacheTimeMillis(long defaultCacheTimeMillis) {
+            this.defaultCacheTimeMillis = defaultCacheTimeMillis;
             return this;
         }
     }

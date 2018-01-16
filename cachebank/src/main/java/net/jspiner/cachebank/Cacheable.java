@@ -6,7 +6,7 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
-public interface Cacheable<T extends Provider> {
+public interface Cacheable<T> {
 
     T now();
 

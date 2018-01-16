@@ -8,7 +8,7 @@ import io.reactivex.Observable;
  * Contact : jspiner@naver.com
  */
 
-final class CacheObject<T extends Provider> {
+final class CacheObject<T> {
 
     private long expireTime;
     private String key;
@@ -22,18 +22,13 @@ final class CacheObject<T extends Provider> {
         this.expireTime = expireTime;
     }
 
-    protected static <T extends Provider> CacheObject newInstance(Class<T> targetClass, String key){
+    protected static <T> CacheObject newInstance(Class<T> targetClass, String key){
         T dataInstance = getTargetInstance(targetClass);
-        T fetchedInstance = (T)dataInstance.fetchData(key, null);
-
-        if(fetchedInstance==null){
-            fetchedInstance = dataInstance;
-        }
 
         // TODO : Provider가 바뀌면서 cache time이 default로 임시 변경됨. 추후 재변경 필요
         CacheObject cacheObject = new CacheObject<T>(
                 key,
-                fetchedInstance,
+                dataInstance,
                 BankConstant.DEFAULT_CACHE_TIME
         );
         return cacheObject;
@@ -50,6 +45,7 @@ final class CacheObject<T extends Provider> {
     }
 
     protected void update(String key){
+        /*
         Observable<T> fetchObservable = value.fetchDataObservable(key, value);
 
         if(fetchObservable != null){
@@ -60,7 +56,7 @@ final class CacheObject<T extends Provider> {
             isObservable = false;
             T fetchData = (T)value.fetchData(key, value);
             value = fetchData;
-        }
+        }*/
     }
 
     protected Observable getValueObservable(){
