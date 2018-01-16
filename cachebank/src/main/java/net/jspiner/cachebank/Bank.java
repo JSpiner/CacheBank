@@ -40,7 +40,7 @@ public final class Bank {
         return isInitialized;
     }
 
-    public static <T> Cacheable<T> deposit(Class<T> targetClass, String key) {
+    public static <K, T> Cacheable<K, T> deposit(Class<T> targetClass, K key) {
         checkInitAndThrow();
 
         return new BaseCacheable(
@@ -51,12 +51,12 @@ public final class Bank {
     }
 
     @Deprecated
-    public static <T> Observable<T> get(Class<T> targetClass, String key) {
+    public static <K, T> Observable<T> get(Class<T> targetClass, K key) {
         checkInitAndThrow();
 
-        return Observable.create((ObservableOnSubscribe<CacheObject<T>>) emmiter -> {
+        return Observable.create((ObservableOnSubscribe<CacheObject<K, T>>) emmiter -> {
 
-            CacheObject<T> cachedObject = getCacheObject(targetClass, key);
+            CacheObject<K, T> cachedObject = getCacheObject(targetClass, key);
 
             emmiter.onNext(cachedObject);
             emmiter.onComplete();
@@ -70,10 +70,10 @@ public final class Bank {
     }
 
     @Deprecated
-    public static <T> T getNow(Class<T> targetClass, String key) {
+    public static <K, T> T getNow(Class<T> targetClass, K key) {
         checkInitAndThrow();
 
-        CacheObject<T> cachedObject = getCacheObject(targetClass, key);
+        CacheObject<K, T> cachedObject = getCacheObject(targetClass, key);
 
         if (cachedObject.isObservable()) {
             return (T) cachedObject.getValueObservable().blockingFirst();
@@ -85,8 +85,8 @@ public final class Bank {
     }
 
     @Deprecated
-    private static <T> CacheObject getCacheObject(Class<T> targetClass, String key) {
-        CacheObject<T> cachedObject = getCacheObjectInCache(targetClass, key);
+    private static <K, T> CacheObject getCacheObject(Class<T> targetClass, K key) {
+        CacheObject<K, T> cachedObject = getCacheObjectInCache(targetClass, key);
 
         boolean isExpired = isExpired(cachedObject);
 
@@ -98,7 +98,7 @@ public final class Bank {
     }
 
     @Deprecated
-    private static <T> CacheObject getCacheObjectInCache(Class<T> targetClass, String key) {
+    private static <K, T> CacheObject getCacheObjectInCache(Class<T> targetClass, K key) {
         CacheObject cachedObject = findInMemory(targetClass, key);
 
         if (cachedObject == null) {
@@ -117,8 +117,8 @@ public final class Bank {
     }
 
     @Deprecated
-    private static <T> CacheObject findInMemory(Class<T> targetClass, String key) {
-        CacheObject<T> cachedObject = (CacheObject<T>) lruMemCache.get(key);
+    private static <K, T> CacheObject findInMemory(Class<T> targetClass, K key) {
+        CacheObject<K, T> cachedObject = (CacheObject<K, T>) lruMemCache.get(key);
         if (cachedObject == null) {
             return null;
         }
@@ -130,19 +130,19 @@ public final class Bank {
 
     @Deprecated
     // TODO : disk cache 구현하기
-    private static <T> CacheObject findInDisk(Class<T> targetClass, String key) {
+    private static <K, T> CacheObject findInDisk(Class<T> targetClass, K key) {
         return null;
     }
 
     @Deprecated
-    private static void registerInMemory(CacheObject cacheObject, String key) {
+    private static <K> void registerInMemory(CacheObject cacheObject, K key) {
         lruMemCache.put(cacheObject, key);
     }
 
-    public static <T> BaseCacheable<T> withdrawal(T value, String key) {
+    public static <K, T> BaseCacheable<K, T> withdrawal(T value, K key) {
         checkInitAndThrow();
 
-        return new BaseCacheable<T>(
+        return new BaseCacheable<K, T>(
                 value,
                 key,
                 CacheableMode.WITHDRAW
@@ -150,10 +150,10 @@ public final class Bank {
     }
 
     @Deprecated
-    public static <T> void put(T value, String key) {
+    public static <K, T> void put(T value, K key) {
         checkInitAndThrow();
         // TODO : default 시간이 아닌 캐시모듈별 시간으로 처리하도록 구현 필요
-        CacheObject<T> cacheObject = new CacheObject<>(
+        CacheObject<K, T> cacheObject = new CacheObject<>(
                 key,
                 value,
                 System.currentTimeMillis() + defaultCacheTimeInMillis

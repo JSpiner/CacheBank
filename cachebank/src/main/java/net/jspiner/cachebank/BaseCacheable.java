@@ -8,20 +8,21 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
-public final class BaseCacheable<T> implements Cacheable<T> {
+public final class BaseCacheable<K, T> implements Cacheable<K, T> {
 
     private Class<T> targetClass;
-    private String key;
+    private K key;
     private T value;
     private CacheableMode cacheableMode;
+    private DataSource<K, T> dataSource;
 
-    protected BaseCacheable(Class<T> targetClass, String key, CacheableMode cacheableMode){
+    protected BaseCacheable(Class<T> targetClass, K key, CacheableMode cacheableMode) {
         this.targetClass = targetClass;
         this.key = key;
         this.cacheableMode = cacheableMode;
     }
 
-    protected BaseCacheable(T value, String key, CacheableMode cacheableMode){
+    protected BaseCacheable(T value, K key, CacheableMode cacheableMode) {
         this.value = value;
         this.key = key;
         this.cacheableMode = cacheableMode;
@@ -42,8 +43,14 @@ public final class BaseCacheable<T> implements Cacheable<T> {
         return getCacheObservable().subscribe(consumer);
     }
 
-    private Observable<T> getCacheObservable(){
-        switch (cacheableMode){
+    @Override
+    public Cacheable dataSource(DataSource<K, T> dataSource) {
+        this.dataSource = dataSource;
+        return this;
+    }
+
+    private Observable<T> getCacheObservable() {
+        switch (cacheableMode) {
             case DEPOSIT:
                 return deposit();
             case WITHDRAW:
@@ -53,11 +60,11 @@ public final class BaseCacheable<T> implements Cacheable<T> {
         }
     }
 
-    private Observable<T> deposit(){
+    private Observable<T> deposit() {
         return Observable.create((ObservableOnSubscribe<CacheObject>) emmiter -> {
-            CacheObject<T> cachedObject = getCacheObject(targetClass, key);
+            CacheObject<K, T> cachedObject = getCacheObject(targetClass, key);
 
-            if(cachedObject == null){
+            if (cachedObject == null) {
                 throw new NullPointerException("cannot update new data");
             }
             emmiter.onNext(cachedObject);
@@ -66,61 +73,61 @@ public final class BaseCacheable<T> implements Cacheable<T> {
         }).flatMap(cacheObject -> cacheObject.getValueObservable());
     }
 
-    private <T> CacheObject getCacheObject(Class<T> targetClass, String key){
-        CacheObject<T> cachedObject = getCacheObjectInCache(targetClass, key);
+    private <T, K> CacheObject getCacheObject(Class<T> targetClass, K key) {
+        CacheObject<K, T> cachedObject = getCacheObjectInCache(targetClass, key);
 
         boolean isExpired = isExpired(cachedObject);
 
-        if(isExpired){
+        if (isExpired) {
             cachedObject.update(key);
         }
 
         return cachedObject;
     }
 
-    private <T> CacheObject getCacheObjectInCache(Class<T> targetClass, String key){
+    private <T, K> CacheObject getCacheObjectInCache(Class<T> targetClass, K key) {
         CacheObject cachedObject = findInMemory(targetClass, key);
 
-        if(cachedObject == null){
+        if (cachedObject == null) {
             cachedObject = findInDisk(targetClass, key);
 
-            if(cachedObject != null){
+            if (cachedObject != null) {
                 registerInMemory(cachedObject, key);
             }
         }
 
-        if(cachedObject == null){
+        if (cachedObject == null) {
             cachedObject = CacheObject.newInstance(targetClass, key);
         }
 
         return cachedObject;
     }
 
-    private <T> CacheObject findInMemory(Class<T> targetClass, String key){
-        CacheObject<T> cachedObject = (CacheObject<T>) Bank.getMemCache().get(key);
-        if(cachedObject == null){
+    private <T, K> CacheObject findInMemory(Class<T> targetClass, K key) {
+        CacheObject<K, T> cachedObject = (CacheObject<K, T>) Bank.getMemCache().get(key);
+        if (cachedObject == null) {
             return null;
         }
-        if(!cachedObject.getValue().getClass().equals(targetClass)){
+        if (!cachedObject.getValue().getClass().equals(targetClass)) {
             throw new ClassCastException();
         }
         return cachedObject;
     }
 
     // TODO : disk cache 구현하기
-    private static <T> CacheObject findInDisk(Class<T> targetClass, String key){
+    private static <T, K> CacheObject findInDisk(Class<T> targetClass, K key) {
         return null;
     }
 
-    private static void registerInMemory(CacheObject cacheObject, String key){
+    private static <T, K> void registerInMemory(CacheObject cacheObject, K key) {
         Bank.getMemCache().put(cacheObject, key);
     }
 
-    private Observable withdraw(){
+    private Observable withdraw() {
         // TODO : default 시간이 아닌 캐시모듈별 시간으로 처리하도록 구현 필요
         return Observable.create(
                 emitter -> {
-                    CacheObject<T> cacheObject = new CacheObject<>(
+                    CacheObject<K, T> cacheObject = new CacheObject<>(
                             key,
                             value,
                             System.currentTimeMillis() * 2 /*+ value.getCacheTime()*/
@@ -133,9 +140,9 @@ public final class BaseCacheable<T> implements Cacheable<T> {
         );
     }
 
-    private static boolean isExpired(CacheObject cacheObject){
+    private static boolean isExpired(CacheObject cacheObject) {
         long currentTime = System.currentTimeMillis();
-        if(cacheObject.getExpireTime() < currentTime){
+        if (cacheObject.getExpireTime() < currentTime) {
             return true;
         }
         return false;

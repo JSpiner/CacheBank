@@ -6,8 +6,8 @@ package net.jspiner.cachebank;
  * Contact : jspiner@naver.com
  */
 
-public interface DataSource<T> {
+public interface DataSource<K, T> {
 
-    void fetchData(DataEmitter<T> emitter);
+    void fetchData(K key, DataEmitter<T> emitter);
 
 }
