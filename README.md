@@ -18,9 +18,11 @@ will support...
 - Disk Cache(Dual mode)
 - Cache Option
 
-## Usage
+## Basic Usage
 
 ### Set up
+You must initialize the `Bank` before using it.
+
 ```java
 new Bank.Builder().init();
 ```
@@ -36,31 +38,52 @@ new Bank.Builder()
 
 ### Define DataModel
 ```java
-class CarModel implements Provider<CarModel> {
+class CarModel {
 
     public int index;
     public String carName;
-
-    @Override
-    public int getCacheTime() {
-        return 1 * 1000;
-    }
-
-    @Override
-    public CarModel fetchData(String key, CarModel prevData) {
-        return yourFetchDataFunction(key);
-    }
-
-    @Override
-    public Observable<CarModel> fetchDataObservable(String key, @Nullable CarModel prevData) {
-        return super.fetchDataObservable(key, prevData);
-    }
 
 }
 
 ```
 
+### Put Data(sync)
+You can store the data using the `deposit()` function.
+
+```java
+void networkResponseCallback(String carId, CarModel carModel){
+    Bank.deposit(carId, carModel).now();
+}
+
+```
+
+The `deposit()` function returns `Cacheable` object.
+
+`Cacheable` object has 3 functions. `now`, `rx`, `subscribe`.
+
+If you want to call a function synchronously, you can use `now`.
+
+Or if you want to call a function asynchronously, you can use `rx` or `subscribe` like below.
+
+
+### Put Data(async)
+```java
+void networkResponseCallback(String carId, CarModel carModel){
+    Observable putObservable = Bank.deposit(carId, carModel).rx();
+    putObservable.subscribe(__ -> Logger.i("saved!"));
+}
+
+//or more simply
+void networkResponseCallbackSimply(String carId, CarModel carModel){
+    Bank.deposit(carId, carModel).subscribe(__ -> Logger.i("saved!"));
+}
+
+```
+
+
 ### Get Data(sync)
+You can load the data as your setting it at initialization. (cachetime, cachemode... etc)
+
 ```java
 
 void setItemLayout(String carId){
@@ -72,8 +95,11 @@ void setItemLayout(String carId){
 
 ```
 
-Get Data Using Observable(async)
-----------------------
+Like the 'deposit' function, the 'withdrawal' function also returns Cacheable.
+Equally, it has three functions. `now`, `rx`, `subscribe`
+Async functions return the cached data or nothing.
+
+### Get Data Using Observable(async)
 ```java
 
 void setItemLayout(String carId){
@@ -96,27 +122,3 @@ void setItemLayoutSimply(String carId){
 
 ```
 
-
-### Put Data(sync)
-```java
-void networkResponseCallback(String carId, CarModel carModel){
-    Bank.deposit(carId, carModel).now();
-}
-
-```
-
-
-
-### Put Data(async)
-```java
-void networkResponseCallback(String carId, CarModel carModel){
-    Observable putObservable = Bank.deposit(carId, carModel).rx();
-    putObservable.subscribe(__ -> Logger.i("saved!"));
-}
-
-//or more simply
-void networkResponseCallbackSimply(String carId, CarModel carModel){
-    Bank.deposit(carId, carModel).subscribe(__ -> Logger.i("saved!"));
-}
-
-```
