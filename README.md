@@ -122,3 +122,62 @@ void setItemLayoutSimply(String carId){
 
 ```
 
+
+## Advanced Usage
+
+### CacheMode
+You can specify cache mode in initialize.
+
+```java
+    new Bank.Builder()
+            .setMemCacheSize(100)
+            .setDiskCacheSize(100)
+            .setCacheMode(CacheMode.MEMORY_ONLY)
+            .init();
+```
+
+There are 3 options. `MEMORY_ONLY`, `DISK_ONLY`, `ALL`
+
+### DataSource
+For a more clear code pattern, it support `DataSource`.
+
+If `DataSource` is defined, data is automatically updated from the `DataSource` only when there is no cache data.
+
+Like this.
+
+```java
+// DataSource<KeyType, DataType>
+public class CarDataSource implements DataSource<String, CarModel> {
+
+    @Override
+    public void fetchData(String key, DataEmitter<CarModel> emitter) {
+        DummyNetwork.requestCar(key).subscribe(
+            carModel -> {
+                emitter.emit(carModel);
+            }
+        );
+    }
+
+}
+```
+
+And set datasource when you use `withdrawal` function.
+
+```java
+CarModel carModel = Bank.withdrawal(CarModell.class, "sonata")
+                        .dataSource(new CarDataSource()).now();
+textView.setText(carModel.carName);
+```
+
+Request new data from datasource only if there is no cached data.
+
+Of course, you can use it with rxJava.(I recommend it)
+
+```java
+CarModel carModel = Bank.withdrawal(CarModell.class, "sonata")
+                        .dataSource(new CarDataSource())
+                        .rx()
+                        .subscribe(
+                            carModel -> textView.setText(carModel.carName)
+                        );
+```
