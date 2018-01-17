@@ -18,16 +18,9 @@ will support...
 - Disk Cache(Dual mode)
 - Cache Option
 
-Cache flow
------------------------
-ASAP....
+## Usage
 
-Structure
--------------------
-ASAP....
-
-Set up
--------------
+### Set up
 ```java
 new Bank.Builder().init();
 ```
@@ -41,8 +34,7 @@ new Bank.Builder()
 ```
 
 
-Define DataModel
-----------------
+### Define DataModel
 ```java
 class CarModel implements Provider<CarModel> {
 
@@ -68,8 +60,7 @@ class CarModel implements Provider<CarModel> {
 
 ```
 
-Get Data(sync)
-----------------------
+### Get Data(sync)
 ```java
 
 void setItemLayout(String carId){
@@ -106,8 +97,7 @@ void setItemLayoutSimply(String carId){
 ```
 
 
-Put Data(sync)
-------------------------
+### Put Data(sync)
 ```java
 void networkResponseCallback(String carId, CarModel carModel){
     Bank.deposit(carId, carModel).now();
@@ -117,8 +107,7 @@ void networkResponseCallback(String carId, CarModel carModel){
 
 
 
-Put Data(async)
-------------------------
+### Put Data(async)
 ```java
 void networkResponseCallback(String carId, CarModel carModel){
     Observable putObservable = Bank.deposit(carId, carModel).rx();
